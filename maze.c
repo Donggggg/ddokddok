@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-#define MAX_QUEUE_SIZE 10001
-#define MAX 10000
+#include "maze.h"
+#include "main.h"
 
 int N; //행
 int M; //열
@@ -12,19 +11,6 @@ int rear;
 int maze[51][51];
 int wall[51][51];
 int visit[51][51];
-
-
-//좌표
-typedef struct xy{
-	int x;
-	int y;
-}xy;
-
-//정답입력
-typedef struct Answer{
-	char Yes_No;
-	int num;
-}Answer;
 
 xy queue[MAX_QUEUE_SIZE];
 
@@ -51,6 +37,36 @@ void enqueue(int x,int y){
 xy dequeue(){
 	front = front % MAX_QUEUE_SIZE;
 	return queue[front++];
+}
+
+void startMaze(int mode){
+	if(mode == SOLO)
+		printf("1인모드입니다.\n");
+	else if(mode == MULTI)
+		printf("다인모드입니다.\n");
+	srand(time(NULL));
+
+	N = 5; //행
+	M = 5; //열
+	
+	//wall배열 최댓값으로 초기화
+	for (int x = 1; x <= M; x++){
+		for (int y = 1; y <= N; y++){
+			wall[x][y] = MAX;
+		}
+	}
+
+	makeMaze();
+
+	visit[1][1] = 0;
+	wall[1][1] = 0;
+
+	enqueue(1,1);
+	shortDistance(1, 1);
+	enqueue(1, 1);
+	breakWall(1, 1);
+	
+	checkAnswer();
 }
 
 //미로 출력 함수
@@ -200,29 +216,4 @@ void checkAnswer(){
 		}
 	}
 	printf("\n정답입니다.\n");
-}
-int main(){
-	srand(time(NULL));
-
-	N = 5; //행
-	M = 5; //열
-	
-	//wall배열 최댓값으로 초기화
-	for (int x = 1; x <= M; x++){
-		for (int y = 1; y <= N; y++){
-			wall[x][y] = MAX;
-		}
-	}
-
-	makeMaze();
-
-	visit[1][1] = 0;
-	wall[1][1] = 0;
-
-	enqueue(1,1);
-	shortDistance(1, 1);
-	enqueue(1, 1);
-	breakWall(1, 1);
-	
-	checkAnswer();
 }
