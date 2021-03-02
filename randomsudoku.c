@@ -5,7 +5,7 @@ int sudoku[9][9] = {0};
 int ran;
 
 //지정된 두 가로 줄 교환// a,b:서로 다른 3*9집합의 가로 줄 번호(a<b)
-void rowTrade(int a, int b){
+void tradeRow(int a, int b){
 	int tmp;
 	for(int j = a*3; j<a+3;j++)
 		for(int i = 0; i<9; i++){
@@ -15,7 +15,7 @@ void rowTrade(int a, int b){
 		}
 }
 //지정된 두 세로 줄 교환// a,b:서로 다른 3*9집합의 세로 줄 번호(a<b)
-void columnTrade(int a, int b){
+void tradeColumn(int a, int b){
 	int tmp;
 	for(int j = a*3; j<a+3; j++)
 		for(int i = 0; i<9; i++){
@@ -159,7 +159,7 @@ void tradeNumber(){
 	
 
 //파일 입출력을 통해 좋은 예시의 스도쿠 원형을 받음
-void initSudoku(){
+void downloadSudoku(){
 	FILE *fp = fopen("sudoku.txt","rt");
 	if(fp==NULL) exit(-1);
 	for(int i = 0; i<9; i++)
@@ -170,6 +170,7 @@ void initSudoku(){
 	fclose(fp);
 }
 
+//파일에 다음에 쓸 스도쿠 저장
 void uploadSudoku(){
 	FILE *fp = fopen("sudoku.txt","wt");
 	if(fp==NULL) exit(-1);
@@ -181,6 +182,7 @@ void uploadSudoku(){
 	fclose(fp);
 }
 
+//스도쿠 오류 발생 시 수정
 void editSudoku(){
 	printf("수정할 스도쿠 입력:\n");
 	for(int i=0; i<9; i++)
