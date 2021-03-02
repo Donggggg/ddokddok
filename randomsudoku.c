@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int sudoku[9][9] = {0};
 int ran;
@@ -156,6 +157,42 @@ void tradeNumber(){
 
 //void removeNum(int level, int weight){
 	
+
+//파일 입출력을 통해 좋은 예시의 스도쿠 원형을 받음
+void initSudoku(){
+	FILE *fp = fopen("sudoku.txt","rt");
+	if(fp==NULL) exit(-1);
+	for(int i = 0; i<9; i++)
+		for(int j = 0; j<9; j++){
+			fscanf(fp, "%d ", &sudoku[i][j]);
+			if(sudoku[i][j] == 0) printf("error:스도쿠가 제대로 입력되지 않았음\n");
+		}
+	fclose(fp);
+}
+
+void uploadSudoku(){
+	FILE *fp = fopen("sudoku.txt","wt");
+	if(fp==NULL) exit(-1);
+	for(int i = 0; i<9; i++)
+		for(int j = 0; j<9; j++){
+			if(sudoku[i][j] == 0) printf("error:스도쿠가 제대로 저장되지 않았음\n");
+			fprintf(fp, "%d ", sudoku[i][j]);
+		}
+	fclose(fp);
+}
+
+void editSudoku(){
+	printf("수정할 스도쿠 입력:\n");
+	for(int i=0; i<9; i++)
+		for(int j=0; j<9; j++){
+			scanf("%d", &sudoku[i][j]);
+			if(sudoku[i][j] < 1 || sudoku[i][j] > 9){
+				printf("error: 1부터 9까지의 자연수를 입력하시오.\n");
+				editSudoku();
+				return ;
+			}
+		}
+}
 
 int main(){
 
