@@ -6,6 +6,7 @@
 
 int N; //행
 int M; //열
+int now;
 int front;
 int rear;
 int maze[51][51];
@@ -40,23 +41,26 @@ xy dequeue(){
 }
 
 void startMaze(int mode){
+
 	if(mode == SOLO)
 		printf("1인모드입니다.\n");
 	else if(mode == MULTI)
 		printf("다인모드입니다.\n");
 	srand(time(NULL));
-
-	N = 5; //행
-	M = 5; //열
 	
+	N = 5;
+	M = 5;
+	now = 5; //현재 단계
+	
+//	sizeMaze();
+	makeMaze();
+
 	//wall배열 최댓값으로 초기화
 	for (int x = 1; x <= M; x++){
 		for (int y = 1; y <= N; y++){
 			wall[x][y] = MAX;
 		}
 	}
-
-	makeMaze();
 
 	visit[1][1] = 0;
 	wall[1][1] = 0;
@@ -65,13 +69,28 @@ void startMaze(int mode){
 	shortDistance(1, 1);
 	enqueue(1, 1);
 	breakWall(1, 1);
-	
+
 	checkAnswer();
+}
+
+//단계에 따른 미로 너비
+void sizeMaze(){
+	int beforeN, beforeM;
+
+	beforeN = N;
+	beforeM = M;
+	 
+	while (1){
+		N += (2 * (rand() % now)); //수치는 나중에 더 생각
+		M += (2 * (rand() % now));
+		if ((N > beforeN) && (M > beforeM)){
+			break;
+		}
+	}
 }
 
 //미로 출력 함수
 void makeMaze(){
-	//난이도에 따라 미로 너비 조정
 	
 	//미로 받는 부분
 	for (int x = 1; x <= N; x++){
@@ -169,6 +188,10 @@ void checkAnswer(){
 	else{
 		maze_check = 0;
 	}
+	if (maze_check == 1)
+		printf("%d %d", maze_check, visit[N][M]);
+	else if (maze_check == 0)
+		printf("%d %d", maze_check, wall[N][M]);
 
 	//정답 확인
 	while (count != 1){

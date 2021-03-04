@@ -17,6 +17,7 @@ int isEmpty();
 void enqueue(int x, int y);
 xy dequeue();
 void startMaze(int mode);
+void sizeMaze();
 void makeMaze();
 void breakWall(int x, int y);
 void shortDistance(int x, int y);
