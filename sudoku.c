@@ -1,20 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-#define TRUE 1
-#define FALSE 0
-
-typedef struct _sudoku{
-	int origin[9][9];
-	int problem[9][9];
-}_Sudoku;
-
-typedef struct _player{
-	int sol[9][9];
-	int input[9][9];
-	//+점수 등
-}_Player;
+#include "sudoku.h"
 
 _Sudoku sudoku;
 _Player* player;
@@ -338,6 +325,8 @@ void makeSudokuProblem(int level){
 //       입력 시 ui 수정 필요       //
 //////////////////////////////////////
 void IN_sudoku(_Player* pop){
+	char ch;
+	getchar();
     for(int i = 0; i<9; i++){
         for(int j = 0; j<9;j++){
             scanf("%d", &pop->input[i][j]);
@@ -346,7 +335,7 @@ void IN_sudoku(_Player* pop){
     }
 }
 
-void startSudoku(int player_num, int level){
+void playSudoku(int player_num, int level){
 	int input_num = 0; 	//답 입력 개수
 	int cor = FALSE; 	//정답 여부
 //라운드 별 반복 구간
@@ -376,12 +365,11 @@ void startSudoku(int player_num, int level){
 	}
 }
 
-int main(){
+void startSudoku(){
 	int level = 1;
 	player = (_Player*)malloc(sizeof(_Player)*1);
 	downloadSudoku();
 	//editSudoku();
-	startSudoku(1,level);
+	playSudoku(1,level);
 	uploadSudoku();
-	return 0;
 }

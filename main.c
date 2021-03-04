@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "main.h"
 #include "maze.h"
+#include "sudoku.h"
 
 void soloMode();
 void multiMode();
@@ -53,6 +54,7 @@ void soloMode()
 			startMaze(SOLO);
 			break;
 		case 2:
+			startSudoku();
 			break;
 		default :
 			printf("없는 메뉴입니다.\n");
