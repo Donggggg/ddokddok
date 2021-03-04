@@ -2,10 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <err.h>
+#include "rank.h"
+
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
 
-char *choices[] = {
+//menu select
+static char *choices[] = {
                         "1. Play Solo",
                         "2. Play Multi",
                         "3. Show Rank",
@@ -15,65 +18,58 @@ char *choices[] = {
                         (char *)NULL,
                   };
 
-void print_logo(WINDOW *my_menu_win)
-{
-        char line[255];
-	FILE *fp;
-        fp=fopen("test.txt","r");
-        if(fp==NULL)    err(EXIT_FAILURE,"NO test.txt file");
-        int i=12;
-        while(fgets(line,sizeof(line),fp)!=NULL)
-        {
-	        //mvwprintw(my_menu_win, i, 30, "%s", line);
-	        mvwprintw(my_menu_win, i++, 4, "%s", line);
-        }
-}
-
+//print ddok ddok logo
+static void print_logo(WINDOW *my_menu_win);
+enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
 int main()
-{	ITEM **my_items;
-	int c;				
+{	//menu seletions in MENU
+        ITEM **my_items;
+	int c;			
+        //MENU WINDOW
 	MENU *my_menu;
+        //MAIN WINDOW
         WINDOW *my_menu_win;
         int n_choices, i;
 	
-	/* Initialize curses */
+        //Init curses
 	initscr();
 	start_color();
         cbreak();
         noecho();
 	keypad(stdscr, TRUE);
 
-	/* Create items */
+        //create menu seletions
         n_choices = ARRAY_SIZE(choices);
-        my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
+        my_items = (ITEM **)malloc(n_choices* sizeof(ITEM *));
+
         for(i = 0; i < n_choices; ++i)
-                my_items[i] = new_item(choices[i], choices[i]);
+                my_items[i] = new_item(choices[i],"");
 
-	/* Crate menu */
-	my_menu = new_menu((ITEM **)my_items);
+	//create menu window
+        my_menu = new_menu((ITEM **)my_items);
 
-	/* Create the window to be associated with the menu */
+        //create main menu window
         my_menu_win = newwin(30, 70, 4, 4);
         keypad(my_menu_win, TRUE);
      
 	/* Set main window and sub window */
+        //?? should to googling
         set_menu_win(my_menu, my_menu_win);
         set_menu_sub(my_menu, derwin(my_menu_win, 6, 17, 3, 1));
 
-	/* Set menu mark to the string " * " */
+        //point user selection
         set_menu_mark(my_menu, "--> ");
-
-	/* Print a border around the main window and print a title */
+        
+        //print title and ddok ddok
         box(my_menu_win, 0, 0);
 	mvwprintw(my_menu_win, 1, 30, "%s", "Game Menu");
 	mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
 	mvprintw(LINES - 2, 34, "ddok ddok");
-        
         print_logo(my_menu_win);
         box(my_menu_win, 0, 0);
         refresh();
         
-	/* Post the menu */
+	//post menu in window
 	post_menu(my_menu);
 	wrefresh(my_menu_win);
 
@@ -85,14 +81,40 @@ int main()
 			case KEY_UP:
 				menu_driver(my_menu, REQ_UP_ITEM);
 				break;
-		}
-                wrefresh(my_menu_win);
-	}	
+			case 10: //enter
+                                {char selection=item_name(current_item(my_menu))[0];
+                                switch(atoi(&selection))
+                                {
+                                    case RANK:
+                                        show_rank();
 
-	/* Unpost and free all the memory taken up */
+                                        clear();
+                                }
+				break;
+                                }
+			
+                }
+                box(my_menu_win, 0, 0);
+                refresh(); 
+	        post_menu(my_menu);
+        	wrefresh(my_menu_win);
+
+	}
+		
+        //free all
         unpost_menu(my_menu);
         free_menu(my_menu);
         for(i = 0; i < n_choices; ++i)
                 free_item(my_items[i]);
 	endwin();
+}
+static void print_logo(WINDOW *my_menu_win)
+{
+        char line[255];
+	FILE *fp;
+        fp=fopen("test.txt","r");
+        if(fp==NULL)    err(EXIT_FAILURE,"NO test.txt file");
+        int i=12;
+        while(fgets(line,sizeof(line),fp)!=NULL)
+	        mvwprintw(my_menu_win, i++, 4, "%s", line);
 }

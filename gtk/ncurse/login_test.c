@@ -22,22 +22,16 @@ int main()
 	cbreak();
 	keypad(stdscr, TRUE);
 
-        
+        //create main window and form window
 	win_body = newwin(30,70, 4, 4);
-	assert(win_body != NULL);
-	box(win_body, 0, 0);
-
 	win_form = derwin(win_body, 20, 60, 4,4 );//20, 60 ,4 ,4
-	assert(win_form != NULL);
-	//box(win_form, 0, 0);
-	mvwprintw(win_body, 1, 2, "Press F3 to quit and F2 to print fields content");
-	
-	fields[0] = new_field(1, 10, 0, 0, 0, 0);
+	mvwprintw(win_body, 1, 15, "Welcome to ddok ddok games");
+	//declare filed location
+	fields[0] = new_field(1, 10, 0, 10, 0, 0);
 	fields[1] = new_field(1, 40, 0, 15, 0, 0);
-	fields[2] = new_field(1, 10, 2, 0, 0, 0);
+	fields[2] = new_field(1, 10, 2, 10, 0, 0);
 	fields[3] = new_field(1, 40, 2, 15, 0, 0);
 	fields[4] = NULL;
-	assert(fields[0] != NULL && fields[1] != NULL && fields[2] != NULL && fields[3] != NULL);
 
 	set_field_buffer(fields[0], 0, "ID : ");
 	set_field_buffer(fields[2], 0, "PW : ");
@@ -46,11 +40,12 @@ int main()
         set_field(fields);
 
 	form = new_form(fields);
-	assert(form != NULL);
+
 	set_form_win(form, win_form);
 	set_form_sub(form, derwin(win_form, 18, 76, 1, 1));//18
 	post_form(form);
 	print_logo(win_body);
+	box(win_body, 0, 0);
 
         //refresh all
         refresh();
@@ -99,6 +94,7 @@ static void driver(int ch)
 
 	switch (ch) {
 		case KEY_F(2):
+                        {
 			// Or the current field buffer won't be sync with what is displayed
 			form_driver(form, REQ_NEXT_FIELD);
 			form_driver(form, REQ_PREV_FIELD);
@@ -106,17 +102,21 @@ static void driver(int ch)
 
 			for (i = 0; fields[i]; i++) {
 				printw("%s", trim_whitespaces(field_buffer(fields[i], 0)));
+	                        //mvprintw(30, 60, "%s", trim_whitespaces(field_buffer(fields[i],0)));
+                                }
 
-				if (field_opts(fields[i]) & O_ACTIVE)
-					printw("\"\t");
+                                if (field_opts(fields[i]) & O_ACTIVE)
+                                	printw("\"\t");
 				else
 					printw(": \"");
-			}
 
 			refresh();
 			pos_form_cursor(form);
-			break;
 
+                        char ID[255];
+                        char PW[255];
+			break;
+                        }
 		case KEY_DOWN:
 			form_driver(form, REQ_NEXT_FIELD);
 			form_driver(form, REQ_END_LINE);
