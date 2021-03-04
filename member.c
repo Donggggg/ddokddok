@@ -1,20 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct Info{
-	char id[30]; //ID
-	char password[30]; //비밀번호
-	char name[20]; //이름
-	char email[30]; //이메일
-	char phone[15]; //번호
-	char nickname[20]; //닉네임
-	int member_number; //고유 회원번호
-	int win; // 승리 횟수 저장
-	int lose; // 패배 횟수 저장 [위 둘을 통해 승률 계산]
-	int manage; // 관리자 유무
-
-} Info;
+#include "member.h"
 
 //회원가입 함수
 void inputInfo(){
@@ -36,7 +23,7 @@ void inputInfo(){
 
 		for(int i = 0; i < N; i++){
 			if(strcmp(input.id, person_list[i].id) == 0){ //만약 닉네임이 겹치면
-				printf("겹치는 ID가 존재합니다. 다시 입력해주세요\n");
+				printf("겹치는 ID가 존재합니다. 다시 입력해주세요\n\n");
 				isExist = 1;
 				break;
 			}
@@ -58,7 +45,7 @@ void inputInfo(){
 		scanf("%s", input.nickname);
 		for(int i = 0; i < N; i++){
 			if(strcmp(input.id, person_list[i].id) == 0){ //만약 닉네임이 겹치면
-				printf("겹치는 ID가 존재합니다. 다시 입력해주세요\n");
+				printf("겹치는 ID가 존재합니다. 다시 입력해주세요\n\n");
 				isExist = 1;
 				break;
 			}
@@ -78,7 +65,7 @@ void inputInfo(){
 
 	fseek(fp,0,SEEK_END); //맨 끝으로 이동
 	fwrite(&input, sizeof(Info), 1, fp); //이진 파일로 저장
-	printf("\n회원가입이 완료되었습니다!\n");
+	printf("\n회원가입이 완료되었습니다!\n\n");
 	fclose(fp);
 
 }
@@ -109,7 +96,7 @@ Info login(){
 			}
 		}
 		if(isExist == 0){
-			printf("존재하지 않는 ID입니다. 다시 입력하세요\n");
+			printf("존재하지 않는 ID입니다. 다시 입력하세요\n\n");
 			continue;
 		}
 		if(isokay==1) //닉네임 완료 
@@ -120,11 +107,11 @@ Info login(){
 		printf("Password : ");
 		scanf("%s", check_password);
 		if(strcmp(check_password, person_list[me].password) == 0){
-			printf("\n로그인이 성공했습니다.\n");
+			printf("\n로그인이 성공했습니다.\n\n");
 			break;
 		}
 		else{
-			printf("패스워드가 틀립니다. 다시 입력하세요\n");
+			printf("패스워드가 틀립니다. 다시 입력하세요\n\n");
 			continue;
 		}
 	}
@@ -210,12 +197,12 @@ void manageMember(){
 		N+=1;
 	}
 	while(1){
-		printf("\n===============================================\n");
+		printf("\n====================관 리 자 메 뉴====================\n");
 		printf("1. 회원 명부 출력 / 2. 회원 삭제 / 3. 관리자 모드 종료\n입력: ");
 		scanf("%d",&go);
 
 		if(go == 1){
-			printf("\n===============================================\n");
+			printf("\n=================================================\n");
 			for(int i = 0; i < N; i++)
 				printf("%02d| 회원번호: %d / 이름: %s / 닉네임: %s / ID: %s / PW: %s\n", i+1,person_list[i].member_number, person_list[i].name, person_list[i].nickname, person_list[i].id, person_list[i].password);
 		}
@@ -248,8 +235,10 @@ void manageMember(){
 
 
 		}
-		else
+		else{
+			printf("없는 메뉴입니다.\n");
 			break;
+		}
 	}
 	fclose(fp);
 }
@@ -257,70 +246,84 @@ void manageMember(){
 // 메뉴창을 프린트하는 함수
 int printMenu(Info member){
 	int go; 
-	if(member.manage == 1){ //관리자
-		printf("\n===============================================\n");
-		printf("1. 로그인 / 2. 회원가입 / 3. 로그인 정보 출력 / ");
-		printf("4. ID 찾기 / 5. 비밀번호 찾기 / 6. 로그아웃 / 7. 종료\n");
-		printf("관리자 메뉴 [ 8. 회원 관리 ]\n");
-		printf("입력 : ");
-		scanf("%d", &go);
+	/*
+	   if(member.manage == 1){ //관리자
+	   printf("\n===============================================\n");
+	   printf("1. ID 찾기 / 2. 비밀번호 찾기 / 3. 로그아웃 / 4. 종료\n");
+	   printf("관리자 메뉴 [ 5. 회원 관리 ]\n");
+	   printf("입력 : ");
+	   scanf("%d", &go);
 
-	}
-	else{
-		printf("\n===============================================\n");
-		printf("1. 로그인 / 2. 회원가입 / 3. 로그인 정보 출력 / ");
-		printf("4. ID 찾기 / 5. 비밀번호 찾기 / 6. 로그아웃 / 7. 종료\n");
-		printf("입력 : ");
-		scanf("%d", &go);
+	   }
+	 */
 
-	}
+	printf("\n===============================================\n");
+	printf("1. 로그인 / 2. 회원가입 / ");
+	printf("3. ID 찾기 / 4. 비밀번호 찾기 / 5. 종료\n");
+	printf("입력 : ");
+	scanf("%d", &go);
+
+
 	return go;
 }
 
 
-int main(){
+void startLogin(Info *player){
 	int go, login_check = 0; //메뉴 이동(일반, 관리자 버전), 로그인 체크
-	Info member; //로그인한 멤버의 정보를 저장
-	go = printMenu(member);
-	while(1){
-		if(go == 1){
+	Info member = {0, }; //로그인한 멤버의 정보를 저장
+	while(login_check == 0){
+		go = printMenu(member);
+		if(go == 1){ //로그인
 			member = login();
 			login_check = 1;
-		}	
-		else if(go == 2){
+			*player = member;
+			break;
+		}
+		else if(go == 2){ //회원가입
 			inputInfo();
 		}
-		else if(go == 3){
-			if(login_check == 0)
-				printf("로그인이 필요합니다.\n");
-			else{
-				printf("Name: %s\n", member.name);
-				printf("NickName: %s\n", member.nickname);
-				printf("E-mail: %s\n", member.email);
-				printf("Phone-number: %s\n", member.phone);
-				printf("Member_number: %d\n", member.member_number);
-			}
-		}	
-		else if(go == 4){
+		else if(go == 3){ //ID 찾기
 			searchIdPass(1);
 		}
-		else if(go == 5){
+		else if(go == 4){ //PW 찾기
 			searchIdPass(2);
 		}
-		else if(go == 6){
-			member.manage = 0;
-			login_check = 0;
-			printf("로그아웃이 완료되었습니다.\n");
+		else if(go == 5){
+			exit(0);
 		}
-		else if(go == 8 && member.manage == 1){
-			manageMember();
-		}
+
+		//manage 관련
+		/*
+		   else if(go == 6){
+		   member.manage = 0;
+		   login_check = 0;
+		   printf("로그아웃이 완료되었습니다.\n");
+		   }
+		 */
 		else 
-			break;
-		go = printMenu(member);
+			exit(0);
+
+	}
+		
+	if(member.manage == 1 && login_check == 1){ //관리자 모드 로그인 시 (관리자 모드가 종료되면 프로그램 종료)
+		manageMember();
+		exit(0);
+	}
 
 }
 
 
+void logout(Info *player){
+	strcpy(player->id,"\0");
+	strcpy(player->password,"\0");
+	strcpy(player->name,"\0");
+	strcpy(player->email,"\0");
+	strcpy(player->phone,"\0");
+	strcpy(player->nickname,"\0");
+	player->member_number = 0;
+	player->win = 0;
+	player->lose = 0;
+	player->manage = 0;
 
+	return;
 }
