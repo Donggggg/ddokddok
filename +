@@ -1,7 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "sudoku.h"
+
+#define TRUE 1
+#define FALSE 0
+
+typedef struct _sudoku{
+	int origin[9][9];
+	int problem[9][9];
+}_Sudoku;
+
+typedef struct _player{
+	int sol[9][9];
+	//+점수 등
+}_Player;
 
 _Sudoku sudoku;
 _Player* player;
@@ -46,11 +58,10 @@ int correctSudoku(_Player* pp){
 		for(int j = 0; j<9;j++){
 			if(!sudoku.problem[i][j]){
 			//빈 칸인 경우
-				k = pp->input[i][j];
 				if(!vertical(k,j,pp->sol) || !horizontal(k,i,pp->sol) || !box(k,j,i,pp->sol))
 					return FALSE; //수가 스도쿠 규칙에 위반할 경우 FALSE 리턴
 				else {
-					pp->sol[i][j] = k;
+					k = pp->sol[i][j];
 					tmp++;
 				}
 			}
@@ -307,9 +318,9 @@ void makeSudokuOrigin(){
 }
 
 void makeSudokuProblem(int level){
-	//레벨 당 구멍 개수: 25 + level*5
+	//레벨 당 구멍 개수: 30 + level*5
 	//조절 가능
-	int count = (25 + level*5), hole;
+	int count = (level*5), hole;
 	blank = count;
 	srand(time(NULL));
 	while(count){
@@ -325,17 +336,14 @@ void makeSudokuProblem(int level){
 //       입력 시 ui 수정 필요       //
 //////////////////////////////////////
 void IN_sudoku(_Player* pop){
-	char ch;
-	getchar();
     for(int i = 0; i<9; i++){
         for(int j = 0; j<9;j++){
-            scanf("%d", &pop->input[i][j]);
-			pop->sol[i][j] = sudoku.problem[i][j];
+            scanf("%d", &pop->sol[i][j]);
 		}
     }
 }
 
-void playSudoku(int player_num, int level){
+void startSudoku(int player_num, int level){
 	int input_num = 0; 	//답 입력 개수
 	int cor = FALSE; 	//정답 여부
 //라운드 별 반복 구간
@@ -365,11 +373,12 @@ void playSudoku(int player_num, int level){
 	}
 }
 
-void startSudoku(){
+int main(){
 	int level = 1;
 	player = (_Player*)malloc(sizeof(_Player)*1);
 	downloadSudoku();
 	//editSudoku();
-	playSudoku(1,level);
+	startSudoku(1,level);
 	uploadSudoku();
+	return 0;
 }
