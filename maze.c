@@ -4,8 +4,7 @@
 #include "maze.h"
 #include "main.h"
 
-int N; //행
-int M; //열
+int N;
 int now;
 int front;
 int rear;
@@ -39,53 +38,53 @@ xy dequeue(){
 	front = front % MAX_QUEUE_SIZE;
 	return queue[front++];
 }
-
-void startMaze(int mode){
-
-	if(mode == SOLO)
-		printf("1인모드입니다.\n");
-	else if(mode == MULTI)
-		printf("다인모드입니다.\n");
+ 
+int startMaze(int mode, int level){
 	srand(time(NULL));
 	
-	N = 5;
-	M = 5;
-	now = 5; //현재 단계
-	
-//	sizeMaze();
-	makeMaze();
-
-	//wall배열 최댓값으로 초기화
-	for (int x = 1; x <= M; x++){
-		for (int y = 1; y <= N; y++){
-			wall[x][y] = MAX;
+	if(mode == SOLO){
+		N = 5 + level;
+		
+		//wall배열 최댓값으로 초기화
+		for (int x = 1; x <= N; x++){
+			for (int y = 1; y <= N; y++){
+				wall[x][y] = MAX;
+			}
 		}
+
+		makeMaze();
+
+		visit[1][1] = 0;
+		wall[1][1] = 0;
+
+		enqueue(1,1);
+		shortDistance(1, 1);
+		enqueue(1, 1);
+		breakWall(1, 1);
+		
+		return 	checkAnswer();
 	}
+	else if(mode == MULTI){
+		printf("다인모드입니다.\n");
 
-	visit[1][1] = 0;
-	wall[1][1] = 0;
-
-	enqueue(1,1);
-	shortDistance(1, 1);
-	enqueue(1, 1);
-	breakWall(1, 1);
-
-	checkAnswer();
-}
-
-//단계에 따른 미로 너비
-void sizeMaze(){
-	int beforeN, beforeM;
-
-	beforeN = N;
-	beforeM = M;
-	 
-	while (1){
-		N += (2 * (rand() % now)); //수치는 나중에 더 생각
-		M += (2 * (rand() % now));
-		if ((N > beforeN) && (M > beforeM)){
-			break;
+		//wall배열 최댓값으로 초기화
+		for (int x = 1; x <= N; x++){
+			for (int y = 1; y <= N; y++){
+				wall[x][y] = MAX;
+			}
 		}
+
+		makeMaze();
+
+		visit[1][1] = 0;
+		wall[1][1] = 0;
+
+		enqueue(1,1);
+		shortDistance(1, 1);
+		enqueue(1, 1);
+		breakWall(1, 1);
+
+		return checkAnswer();
 	}
 }
 
@@ -94,11 +93,11 @@ void makeMaze(){
 	
 	//미로 받는 부분
 	for (int x = 1; x <= N; x++){
-		for (int y = 1; y <= M; y++){
+		for (int y = 1; y <= N; y++){
 			if (x == 1 && y == 1){
 				maze[x][y] = 1;
 			}
-			else if (x == M && y == N){
+			else if (x == N && y == N){
 				maze[x][y] = 1;
 			}
 			else{
@@ -109,7 +108,7 @@ void makeMaze(){
 
 	//미로 출력
 	for (int x = 1; x <= N; x++){
-		for (int y = 1; y <= M; y++){
+		for (int y = 1; y <= N; y++){
 			printf("%d", maze[x][y]);
 		}
 		printf("\n");
@@ -127,7 +126,7 @@ void breakWall(int x, int y){
 			ny = pop.y + dy[i];
 
 			//미로판을 아예 나갈 때
-			if (nx < 1 || nx > M || ny < 1 || ny > N){
+			if (nx < 1 || nx > N || ny < 1 || ny > N){
 				continue;
 			}
 			
@@ -161,7 +160,7 @@ void shortDistance(int x, int y){
 			ny = pop.y + dy[i];
 
 			//미로판을 아예 나갈 때
-			if (nx < 1 || nx > M || ny <1 || ny > N)
+			if (nx < 1 || nx > N || ny <1 || ny > N)
 				continue;
 			//벽인 경우
 			if (maze[nx][ny] == 0)
@@ -176,22 +175,23 @@ void shortDistance(int x, int y){
 }
 
 //정답 확인 함수
-void checkAnswer(){
+int checkAnswer(){
 	Answer answer;
+	int wrong = 0;
 	int maze_check; //미로가 탈출 가능하면 1, 아닐 경우 0
 	int count = 0; //정답일 경우 1, 아닐 경우 0
 
 	//탈출 가능한 미로인지 확인 여부
-	if (wall[N][M] == 0){
+	if (wall[N][N] == 0){
 		maze_check = 1;
 	}
 	else{
 		maze_check = 0;
 	}
 	if (maze_check == 1)
-		printf("%d %d", maze_check, visit[N][M]);
+		printf("%d %d", maze_check, visit[N][N]);
 	else if (maze_check == 0)
-		printf("%d %d", maze_check, wall[N][M]);
+		printf("%d %d", maze_check, wall[N][N]);
 
 	//정답 확인
 	while (count != 1){
@@ -209,34 +209,39 @@ void checkAnswer(){
 		//정답인지 확인
 		if (maze_check == 1){
 			if (answer.Yes_No == 'O' || answer.Yes_No == 'o'){
-				if (answer.num == visit[N][M]){
+				if (answer.num == visit[N][N]){
 					count = 1;
 				}
 				else{
 					printf("\n틀렸습니다.\n");
+					wrong++;
 					continue;
 				}
 			}
 			else{
 				printf("\n틀렸습니다.\n");
+				wrong++;
 				continue;
 			}
 		}
 		else if (maze_check == 0){
 			if (answer.Yes_No == 'X' || answer.Yes_No == 'x'){
-				if (answer.num == wall[N][M]){
+				if (answer.num == wall[N][N]){
 					count = 1;
 				}
 				else{
 					printf("\n틀렸습니다.\n");
+					wrong++;
 					continue;
 				}
 			}
 			else{
 				printf("\n틀렸습니다.\n");
+				wrong++;
 				continue;
 			}
 		}
 	}
 	printf("\n정답입니다.\n");
+	return wrong;
 }

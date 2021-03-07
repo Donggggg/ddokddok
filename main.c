@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "main.h"
 #include "maze.h"
 #include "member.h"
@@ -42,19 +43,52 @@ int main()
 	return 0;
 }
 
+
+int level;
+
 void soloMode()
 {
-	int input;
-
+	int input, wrong, regist;
+	double times;
+	time_t start, end;
+	wrong = 0;
+	printf("1인모드입니다.\n");
 	printf("1. 미로 2. 스도쿠\n");
 	printf("> ");
 	scanf("%d", &input);
 	switch(input) {
 		case 1:
-			startMaze(SOLO);
+			printf("난이도(1 ~ 10)까지 입력 : ");
+			scanf("%d", &level);
+			printf("\n");
+			start = time(NULL);
+			wrong = startMaze(SOLO,level);
+			end = time(NULL);
+			times = (double)(end-start) + (double)(wrong*10);
+			printf("점수 : %.2lf\n", times);
+			printf("점수를 등록하시겠습니까? (1/0)");
+			scanf("%d",&regist);
+			if(regist == 1){
+				input_score(player, times, level, input);
+			}
+
 			break;
 		case 2:
-			startSudoku();
+			printf("난이도(1 ~ 10)까지 입력 : ");
+			scanf("%d", &level);
+			printf("\n");
+			start = time(NULL);
+			wrong = startSudoku(SOLO,level);
+			end = time(NULL);
+			times = (double)(end-start) + (double)(wrong*10);
+			printf("점수 : %.2lf\n", times);
+			printf("점수를 등록하시겠습니까? (1/0)");
+			scanf("%d",&regist);
+			if(regist == 1){
+			
+			}
+
+
 			break;
 		default :
 			printf("없는 메뉴입니다.\n");
@@ -66,5 +100,5 @@ void soloMode()
 
 void multiMode()
 {
-	startMaze(MULTI);
+	startMaze(MULTI,level);
 }

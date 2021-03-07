@@ -35,5 +35,5 @@ int complete(_Player*);		//스도쿠 완성 시 TRUE 리턴
 int correctSudoku(_Player*);	//스도쿠 정답 검증
 int completeSudoku(int);	//입력-답 입력 개수, 리턴-스도쿠 완성 여부
 
-void startSudoku();
-void playSudoku(int,int);	//입력-플레이어번호,레벨, 전체적인 기능 불러오기
+int startSudoku(int,int);		//입력-모드,레벨
+int playSudoku(int,int);	//입력-플레이어번호,레벨, 전체적인 기능 불러오기
