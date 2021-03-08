@@ -31,7 +31,7 @@ int getch(void){
 }
 
 void inputScore(Info *member, double score, int level, int miro_su){
-	Score input = {"",0}; //라운드는 5로 고정(예)
+	Score input = {"",0};
 	FILE *fp = fopen("score.txt","ab+");
 	if(fp==NULL){
 		printf("파일 오류입니다.\n");
