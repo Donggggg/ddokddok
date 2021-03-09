@@ -92,7 +92,7 @@ void soloMode()
 			scanf("%d", &level);
 			printf("\n");
 			start = time(NULL);
-			wrong = startSudoku(SOLO,level);
+			wrong = startSudoku(SOLO,level,game);
 			end = time(NULL);
 			times = (double)(end-start) + (double)(wrong*10);
 			printf("점수 : %.2lf\n", times);
@@ -133,8 +133,8 @@ void multiMode()
 			startMaze(MULTI,game->round[0],game);
 			game->round[0] += 1;
 		}
-		else if (game->game_select[i] == 0){
-			startSudoku(MULTI, game->round[0]);
+		else if (game->game_select[i] == 2){
+			startSudoku(MULTI, game->round[0],game);
 			game->round[0] += 1;
 		}
 		else{

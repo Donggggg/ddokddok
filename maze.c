@@ -196,8 +196,9 @@ int checkAnswer(int mode, Game *game){
 		
 		if(mode == MULTI){
 			//플레이어 번호
-			printf("플레이어 번호 : ");
-		 	scanf("%d",&player);
+			printf("\n플레이어 번호 : ");
+			scanf("%d",&player);
+			getchar();
 			if (game->plus_score[player-1] <= 0){
 				printf("기회가 없습니다.\n");
 				continue;
@@ -205,7 +206,7 @@ int checkAnswer(int mode, Game *game){
 		}
 		//답 입력
 		printf("\n탈출이 가능한가요? (O or X) : ");
-		scanf(" %c", &answer.Yes_No);
+		scanf("%c", &answer.Yes_No);
 		if (answer.Yes_No == 'O' || answer.Yes_No == 'o'){
 			printf("미로를 탈출하기 위한 최단경로의 길이는? : ");
 			scanf("%d", &answer.num);
