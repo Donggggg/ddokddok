@@ -2,28 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <err.h>
-#include "rank.h"
-#include "login_test.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
 
 //menu select
 static char *choices[] = {
-                        "1. Play Solo",
-                        "2. Play Multi",
-                        "3. Show Rank",
-                        "4. Options",
-                        "5. Logout",
-                        "6. Exit",
+                        "1. SUDOKU",
+                        "2. MAZE",
                         (char *)NULL,
                   };
 
 //print ddok ddok logo
 static void print_logo(WINDOW *my_menu_win);
-enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
 int main()
 {	
-        login();        
         //menu seletions in MENU
         ITEM **my_items;
 	int c;			
@@ -74,7 +66,8 @@ int main()
 	//post menu in window
 	post_menu(my_menu);
 	wrefresh(my_menu_win);
-        int flag=0;
+        int flag=0,level=1;
+        enum{SUDOKU=1,MAZE};
 	while((c = wgetch(my_menu_win)) != KEY_F(2))
 	{       switch(c)
 	        {	case KEY_DOWN:
@@ -83,6 +76,15 @@ int main()
 			case KEY_UP:
 				menu_driver(my_menu, REQ_UP_ITEM);
 				break;
+                        case KEY_LEFT:
+                                if(level>1) level-=1;
+                                //mvwprintw(my_menu_win,30,8,"%d",level);
+	                        mvprintw(LINES - 2, 34, "LEVEL : %d              ",level);
+                                break;
+                        case KEY_RIGHT:
+                                if(level<10) level+=1;
+                                mvprintw(LINES-2,34,"LEVEL : %d"                 ,level);
+/*                  
 			case 10: //enter
                                 {char selection=item_name(current_item(my_menu))[0];
                                 //enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
@@ -98,7 +100,7 @@ int main()
                                         break;
                                 }
 				break;
-                                }
+                                }*/
 			
                 }
 

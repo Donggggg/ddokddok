@@ -13,7 +13,8 @@ static void set_field(FIELD *field[]);
 static void driver(int ch);
 static void free_all(FORM *form,FIELD *fields[]);
 static void print_logo(WINDOW *my_menu_win);
-int main()
+
+void login()
 {
         //init window tab
 	initscr();
@@ -56,7 +57,7 @@ int main()
 	int ch;
 	while ((ch = getch()) != KEY_F(3))
 		driver(ch);
-
+        clear();
         //free all
 	unpost_form(form);
         free_all(form,fields);
@@ -64,7 +65,6 @@ int main()
 	delwin(win_body);
 	endwin();
 
-	return 0;
 }
 static char* trim_whitespaces(char *str)
 {
@@ -93,7 +93,7 @@ static void driver(int ch)
 	int i;
 
 	switch (ch) {
-		case KEY_F(2):
+		case 10://enter
                         {
 			// Or the current field buffer won't be sync with what is displayed
 			form_driver(form, REQ_NEXT_FIELD);
@@ -101,14 +101,15 @@ static void driver(int ch)
 			move(LINES-3, 2);
 
 			for (i = 0; fields[i]; i++) {
+                                if(field_opts(fields[i])&O_ACTIVE)
 				printw("%s", trim_whitespaces(field_buffer(fields[i], 0)));
 	                        //mvprintw(30, 60, "%s", trim_whitespaces(field_buffer(fields[i],0)));
                                 }
 
-                                if (field_opts(fields[i]) & O_ACTIVE)
-                                	printw("\"\t");
-				else
-					printw(": \"");
+                                //if (field_opts(fields[i]) & O_ACTIVE)
+                                //	printw("\"\t");
+				//else
+				//	printw(": \"");
 
 			refresh();
 			pos_form_cursor(form);
@@ -117,6 +118,10 @@ static void driver(int ch)
                         char PW[255];
 			break;
                         }
+                case 0x09://tab
+                        form_driver(form,REQ_NEXT_FIELD);
+                        form_driver(form,REQ_END_LINE);
+                        break;
 		case KEY_DOWN:
 			form_driver(form, REQ_NEXT_FIELD);
 			form_driver(form, REQ_END_LINE);
