@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
 typedef struct Setting{
 	
 	int miro_round;
@@ -11,7 +12,7 @@ typedef struct Setting{
 	int minus_score; //다인모드 감점 스코어
 
 } Setting;
-
+*/
 
 void setOption(Setting *set){
 	printf("다인 모드의 미로 라운드 수 : ");

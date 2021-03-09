@@ -33,9 +33,9 @@ typedef struct Game{
 
 void deleteFile(){
 	int dResult = remove("back_up.txt");
-	if(dResult == -1){
+/*	if(dResult == -1){
 		printf("파일 삭제가 실패했습니다.\n파일이 존재하는지 확인하고 다시 시도해 주세요.\n");
-	}
+		} */
 }
 
 void setGame(Game *game, Setting *set){ // 새로운 게임 만들기
@@ -96,18 +96,24 @@ void saveGame(Game game){ //세이브파일 만들기
 
 
 int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이 1이면 세이브파일O + 저장
-	FILE fp1 = fopen("back_up.txt","rb");
+	FILE *fp1 = fopen("back_up.txt","rb");
+	int check;
 	if(fp1==NULL){
-		printf("세이브파일에 오류가 있습니다. 죄송합니다\n");
+//		printf("세이브파일에 오류가 있습니다. 죄송합니다\n");
 		return 0;
 	}
 	else{
-		printf("세이브파일 불러오는 중....\n");
-		fread(&game, sizeof(Game), 1, fp1);
-		fclose(fp);
-		printf("세이브파일 불러오기가 성공했습니다.\n");
-
-		return 1;
+		printf("세이브파일이 존재합니다. 불러오시겠습니까? (1|0)\n");
+		scanf("%d", &check);
+		if(check == 1){
+			printf("세이브파일 불러오는 중....\n");
+			fread(&game, sizeof(Game), 1, fp1);
+			fclose(fp1);
+			printf("세이브파일 불러오기가 성공했습니다.\n");
+			return 1;
+		}
+		else
+			return 0;
 	}
 
 }	
@@ -116,14 +122,14 @@ int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이
 
 
 
-
+/*
 int main(){ //새 게임을 시작하거나 기존 게임을 불러오는 경우 세이브파일 삭제
 
 	srand(time(NULL));
 
-	Game game = {0};
+	Game game = {0, };
 	Setting set = {3, 2, 1, 10}; //미로 3라운드 스도쿠 2라운드 기본 레벨 1 감점 10
 	setGame(&game, &set);
 
-
 }
+*/

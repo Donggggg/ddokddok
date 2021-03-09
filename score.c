@@ -235,9 +235,10 @@ void printScore(){
 
 }
 
-
+/*
 int main(){
 	Info *member = malloc(sizeof(Info));
 	strcpy(member->nickname,"Parkyusu");
 	printScore();
 }
+*/
