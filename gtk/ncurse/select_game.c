@@ -14,7 +14,7 @@ static char *choices[] = {
 
 //print ddok ddok logo
 static void print_logo(WINDOW *my_menu_win);
-int main()
+void select_game()
 {	
         //menu seletions in MENU
         ITEM **my_items;
@@ -84,25 +84,13 @@ int main()
                         case KEY_RIGHT:
                                 if(level<10) level+=1;
                                 mvprintw(LINES-2,34,"LEVEL : %d"                 ,level);
-/*                  
+                                break; 
 			case 10: //enter
-                                {char selection=item_name(current_item(my_menu))[0];
-                                //enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
-                                switch(atoi(&selection))
-                                {
-                                    case RANK:
-                                        show_rank();
-                                        clear();
-                                        break;
-                                    case EXIT:
                                         flag=1;
                                         clear();
                                         break;
                                 }
-				break;
-                                }*/
 			
-                }
 
                 if(flag) break;
                 box(my_menu_win, 0, 0);

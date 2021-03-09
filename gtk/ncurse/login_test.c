@@ -4,17 +4,20 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <err.h>
+//#include "member.h"
 static FORM *form;
 static FIELD *fields[5];
 static WINDOW *win_body, *win_form;
+static char ID[255];
+static char PW[255];
 
 static char* trim_whitespaces(char *str);
 static void set_field(FIELD *field[]);
 static void driver(int ch);
 static void free_all(FORM *form,FIELD *fields[]);
 static void print_logo(WINDOW *my_menu_win);
-
-void login()
+//Info *player;
+void login_UI()
 {
         //init window tab
 	initscr();
@@ -102,7 +105,11 @@ static void driver(int ch)
 
 			for (i = 0; fields[i]; i++) {
                                 if(field_opts(fields[i])&O_ACTIVE)
-				printw("%s", trim_whitespaces(field_buffer(fields[i], 0)));
+                                {
+				//sprintf(ID,"%s", trim_whitespaces(field_buffer(fields[i], 0)));
+			        strcpy(ID, trim_whitespaces(field_buffer(fields[i], 0)));
+				printw("%s", ID);
+                                }
 	                        //mvprintw(30, 60, "%s", trim_whitespaces(field_buffer(fields[i],0)));
                                 }
 
@@ -113,9 +120,9 @@ static void driver(int ch)
 
 			refresh();
 			pos_form_cursor(form);
-
-                        char ID[255];
-                        char PW[255];
+                        //pass=login(ID,PW);
+                        //if(pass.ID==NULL)break;
+                        //if(pass.ID) return;
 			break;
                         }
                 case 0x09://tab

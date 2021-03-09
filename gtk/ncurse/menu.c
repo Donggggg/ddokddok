@@ -4,6 +4,7 @@
 #include <err.h>
 #include "rank.h"
 #include "login_test.h"
+#include "select_game.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
 
@@ -23,7 +24,7 @@ static void print_logo(WINDOW *my_menu_win);
 enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
 int main()
 {	
-        login();        
+        login_UI();        
         //menu seletions in MENU
         ITEM **my_items;
 	int c;			
@@ -88,7 +89,12 @@ int main()
                                 //enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
                                 switch(atoi(&selection))
                                 {
+                                    case SOLO:
+                                        select_game();
+                                        clear();
+                                        break;
                                     case RANK:
+                                        select_game();
                                         show_rank();
                                         clear();
                                         break;

@@ -14,7 +14,7 @@ typedef struct Info{
 } Info;
 
 void inputInfo();
-Info login();
+Info login(char ID[255], char PW[255]);
 void searchIdPass(int check);
 void manageMember();
 int printMenu(Info member);
