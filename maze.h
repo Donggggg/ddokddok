@@ -16,8 +16,8 @@ typedef struct Answer{
 int isEmpty();
 void enqueue(int x, int y);
 xy dequeue();
-int startMaze(int mode, int level);
+int startMaze(int mode, int level, Game *game);
 void makeMaze();
 void breakWall(int x, int y);
 void shortDistance(int x, int y);
-int checkAnswer();
+int checkAnswer(int mode, Game *game);

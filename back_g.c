@@ -6,7 +6,7 @@
 //#include "maze.h"
 //#include "sudoku.h"
 #include "setting.h"
-
+#include "back_g.h"
 
 void deleteFile(){
 	int dResult = remove("back_up.txt");
@@ -18,16 +18,15 @@ void deleteFile(){
 void setGame(Game *game, Setting *set){ // 새로운 게임 만들기
 	printf("\n플레이할 인원 수를 입력하세요(최대 5인) : ");
 	scanf("%d",&game->people);
-	sleep(1);
 
-	printf("\n기본 설정 난이도는 %d 입니다.\n",set->basic_level);
-	game->level = set->basic_level; //현재 레벨은 기본 레벨
-	sleep(1); 
+
+	game->minus_score = set->minus_score;
+	printf("\n각 라운드 당 감점 점수는 %d 입니다.\n", game->minus_score);
+
 
 	printf("\n총 라운드 수는 미로 %d라운드 | 스도쿠 %d라운드 | 총 %d 라운드 입니다.\n",set->miro_round, set->sudoku_round, (set->miro_round) + (set->sudoku_round));
 	game->round[1] = (set->miro_round) + (set->sudoku_round);
 	game->round[0] = 1; //처음은 1라운드
-	sleep(1);
 
 	int check_miro = set->miro_round, check_sudoku = set->sudoku_round;
 	for(int i = 0; i < game->round[1]; i++){ //1은 미로, 2는 스도쿠
@@ -51,7 +50,6 @@ void setGame(Game *game, Setting *set){ // 새로운 게임 만들기
 			printf("%d라운드 : 스도쿠 게임\n",i+1);
 	}
 	printf("\n입니다.\n");
-	sleep(1);
 
 	printf("\n\n게임을 시작하겠습니다.\n\nenter를 눌러주세요....\n");
 	deleteFile(); //기존의 세이브파일을 삭제

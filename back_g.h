@@ -18,6 +18,7 @@ typedef struct Game{
 	int round[2]; // 현재 라운드/총라운드
 	int score[5]; // 각 인원당 스코어
 	int plus_score[5]; //각 인원당 해당 라운드 획득할 스코어
+	int minus_score; //틀릴 때마다 감점되는 점수
 
 } Game;
 

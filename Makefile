@@ -1,5 +1,5 @@
-ddokddok : main.o member.o maze.o sudoku.o
-	gcc main.o member.o maze.o sudoku.o setting.o score.o -o ddokddok
+ddokddok : main.o member.o maze.o sudoku.o setting.o score.o back_g.o
+	gcc main.o member.o maze.o sudoku.o setting.o score.o back_g.o -o ddokddok
 
 main.o : main.c main.h
 	gcc -c main.c
@@ -18,6 +18,9 @@ setting.o : setting.c setting.h
 
 score.o : score.c score.h
 	gcc -c score.c
+
+back_g.o : back_g.c back_g.h
+	gcc -c back_g.c
 
 clean :
 		rm *.o

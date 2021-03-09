@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "setting.h"
+#include "back_g.h"
 #include "maze.h"
 #include "main.h"
 
@@ -39,18 +41,20 @@ xy dequeue(){
 	return queue[front++];
 }
  
-int startMaze(int mode, int level){
+int startMaze(int mode, int level, Game *game){
 	srand(time(NULL));
 	
-	if(mode == SOLO){
-		N = 5 + level;
-		
-		//wall배열 최댓값으로 초기화
-		for (int x = 1; x <= N; x++){
-			for (int y = 1; y <= N; y++){
-				wall[x][y] = MAX;
-			}
+	N = 5 + level;
+
+	//wall배열 최댓값으로 초기화
+	for (int x = 1; x <= N; x++){
+		for (int y = 1; y <= N; y++){
+			wall[x][y] = MAX;
 		}
+	}
+
+	if(mode == SOLO){
+		
 
 		makeMaze();
 
@@ -62,17 +66,9 @@ int startMaze(int mode, int level){
 		enqueue(1, 1);
 		breakWall(1, 1);
 		
-		return 	checkAnswer();
+		return 	checkAnswer(mode, game);
 	}
 	else if(mode == MULTI){
-		printf("다인모드입니다.\n");
-
-		//wall배열 최댓값으로 초기화
-		for (int x = 1; x <= N; x++){
-			for (int y = 1; y <= N; y++){
-				wall[x][y] = MAX;
-			}
-		}
 
 		makeMaze();
 
@@ -84,7 +80,7 @@ int startMaze(int mode, int level){
 		enqueue(1, 1);
 		breakWall(1, 1);
 
-		return checkAnswer();
+		return checkAnswer(mode, game);
 	}
 }
 
@@ -175,7 +171,7 @@ void shortDistance(int x, int y){
 }
 
 //정답 확인 함수
-int checkAnswer(){
+int checkAnswer(int mode, Game *game){
 	Answer answer;
 	int wrong = 0;
 	int maze_check; //미로가 탈출 가능하면 1, 아닐 경우 0
@@ -188,13 +184,25 @@ int checkAnswer(){
 	else{
 		maze_check = 0;
 	}
+	/* 답 표시
 	if (maze_check == 1)
 		printf("%d %d", maze_check, visit[N][N]);
 	else if (maze_check == 0)
 		printf("%d %d", maze_check, wall[N][N]);
-
+*/
+	int player;
 	//정답 확인
 	while (count != 1){
+		
+		if(mode == MULTI){
+			//플레이어 번호
+			printf("플레이어 번호 : ");
+		 	scanf("%d",&player);
+			if (game->plus_score[player-1] <= 0){
+				printf("기회가 없습니다.\n");
+				continue;
+			}
+		}
 		//답 입력
 		printf("\n탈출이 가능한가요? (O or X) : ");
 		scanf(" %c", &answer.Yes_No);
@@ -215,12 +223,14 @@ int checkAnswer(){
 				else{
 					printf("\n틀렸습니다.\n");
 					wrong++;
+					game->plus_score[player-1] -= 50;
 					continue;
 				}
 			}
 			else{
 				printf("\n틀렸습니다.\n");
 				wrong++;
+					game->plus_score[player-1] -= 50;
 				continue;
 			}
 		}
@@ -232,16 +242,19 @@ int checkAnswer(){
 				else{
 					printf("\n틀렸습니다.\n");
 					wrong++;
+					game->plus_score[player-1] -= 50;
 					continue;
 				}
 			}
 			else{
 				printf("\n틀렸습니다.\n");
 				wrong++;
+					game->plus_score[player-1] -= 50;
 				continue;
 			}
 		}
 	}
 	printf("\n정답입니다.\n");
+	game->score[player-1] += game->plus_score[player-1];	
 	return wrong;
 }
