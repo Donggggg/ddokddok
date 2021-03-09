@@ -8,7 +8,7 @@
 
 #include "score.h"
 #include "setting.h"
-//#include "back_g.h"
+#include "back_g.h"
 
 void soloMode();
 void multiMode();
@@ -54,10 +54,10 @@ int main()
 }
 
 
-int level;
 
 void soloMode()
 {
+	int level;
 	int input, wrong, regist;
 	double times;
 	time_t start, end;
