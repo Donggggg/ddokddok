@@ -262,13 +262,15 @@ int checkAnswer(int mode, Game *game){
 		}
 		
 		//모든 플레이어 기회 x
-		isGameover = 1;
-		for(int k = 0; k<game->people; k++){
-			if(game ->plus_score[k] > 0) isGameover = 0;
-		}
-		if(isGameover){
-			printf("무승부");
-			break;
+		if(mode==MULTI){
+			isGameover = 1;
+			for(int k = 0; k<game->people; k++){
+				if(game ->plus_score[k] > 0) isGameover = 0;
+			}
+			if(isGameover){
+				printf("무승부");
+				break;
+			}
 		}
 	}
 	printf("\n정답입니다.\n");

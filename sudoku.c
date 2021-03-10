@@ -383,15 +383,16 @@ int playSudoku(int mode,int level,Game* game){
 				game->score[playerNum-1] = game->plus_score[playerNum-1];
 			}
 		}
-		
-		isGameover = 1;
-		//모든 플레이어가 점수를 잃었을 때 gameover
-		for(int k = 0; k<game->people; k++){
-			if(game -> plus_score[k] > 0) isGameover = 0;
-		}
-		if(isGameover) {
-			printf("무승부\n");
-			break;
+		if(mode == MULTI){	
+			isGameover = 1;
+			//모든 플레이어가 점수를 잃었을 때 gameover
+			for(int k = 0; k<game->people; k++){
+				if(game -> plus_score[k] > 0) isGameover = 0;
+			}
+			if(isGameover) {
+				printf("무승부\n");
+				break;
+			}
 		}
 	}
 	return wrong;
