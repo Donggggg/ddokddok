@@ -326,9 +326,7 @@ void makeSudokuProblem(int level){
 	}
 }
 
-//////////////////////////////////////
-//       입력 시 ui 수정 필요       //
-//////////////////////////////////////
+//저장된 스도쿠 불러오기
 void IN_sudoku(_Player* pop){
 	char ch;
 	getchar();
@@ -350,17 +348,17 @@ int playSudoku(int mode,int level,Game* game){
 	printSudoku(sudoku.problem);
 	printSudoku(sudoku.origin);
 	
-	int playerNum;
+	int playerNum, isGameover;
 	while(!cor){
 		if(mode == MULTI){
-			printf("플레이어 번호 입력: ");
-			scanf("%d", &playerNum);
+			printf("\n플레이어 번호 입력: ");
+			scanf(" %d", &playerNum);
 			if(playerNum>game->people||playerNum<0) {
 				printf("잘못된 값입니다.\n");
 				continue;
 			}
 			if(game->plus_score[playerNum-1] <= 0){
-				printf("기회없음\n");
+				printf("해당 플레이어는 기회가 없습니다.\n");
 				continue;
 			}
 		}
@@ -384,6 +382,16 @@ int playSudoku(int mode,int level,Game* game){
 				printSudoku(player->sol);
 				game->score[playerNum-1] = game->plus_score[playerNum-1];
 			}
+		}
+		
+		isGameover = 1;
+		//모든 플레이어가 점수를 잃었을 때 gameover
+		for(int k = 0; k<game->people; k++){
+			if(game -> plus_score[k] > 0) isGameover = 0;
+		}
+		if(isGameover) {
+			printf("무승부\n");
+			break;
 		}
 	}
 	return wrong;

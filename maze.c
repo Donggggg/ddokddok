@@ -190,7 +190,7 @@ int checkAnswer(int mode, Game *game){
 	else if (maze_check == 0)
 		printf("%d %d", maze_check, wall[N][N]);
 */
-	int player;
+	int player, isGameover;
 	//정답 확인
 	while (count != 1){
 		
@@ -253,6 +253,16 @@ int checkAnswer(int mode, Game *game){
 					game->plus_score[player-1] -= 50;
 				continue;
 			}
+		}
+		
+		//모든 플레이어 기회 x
+		isGameover = 1;
+		for(int k = 0; k<game->people; k++){
+			if(game ->plus_score[k] > 0) isGameover = 0;
+		}
+		if(isGameover){
+			printf("무승부");
+			break;
 		}
 	}
 	printf("\n정답입니다.\n");
