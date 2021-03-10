@@ -4,9 +4,9 @@
 #include "main.h"
 #include "setting.h"
 #include "back_g.h"
-#include "maze.h"
 #include "member.h"
 #include "sudoku.h"
+#include "maze.h"
 
 #include "score.h"
 
