@@ -184,12 +184,7 @@ int checkAnswer(int mode, Game *game){
 	else{
 		maze_check = 0;
 	}
-	/* 답 표시
-	if (maze_check == 1)
-		printf("%d %d", maze_check, visit[N][N]);
-	else if (maze_check == 0)
-		printf("%d %d", maze_check, wall[N][N]);
-*/
+
 	int player, isGameover;
 	//정답 확인
 	while (count != 1){
@@ -215,7 +210,7 @@ int checkAnswer(int mode, Game *game){
 		scanf(" %c", &answer.Yes_No);
 		if (answer.Yes_No == 'O' || answer.Yes_No == 'o'){
 			printf("미로를 탈출하기 위한 최단경로의 길이는? : ");
-			scanf("%d", &answer.num);
+	    		scanf("%d", &answer.num);
 			getchar();
 		}
 		else if (answer.Yes_No == 'X' || answer.Yes_No == 'x'){

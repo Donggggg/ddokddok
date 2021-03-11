@@ -24,7 +24,6 @@ static void print_logo(WINDOW *my_menu_win);
 enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
 int main()
 {	
-        login_UI();        
         //menu seletions in MENU
         ITEM **my_items;
 	int c;			

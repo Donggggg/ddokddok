@@ -88,6 +88,8 @@ void select_game()
 			case 10: //enter
                                         flag=1;
                                         clear();
+                                        startMaze(1,level,NULL);
+                                        clear();
                                         break;
                                 }
 			
