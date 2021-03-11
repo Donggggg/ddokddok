@@ -21,10 +21,6 @@ void setOption(Setting *set){
 	printf("다인 모드의 스도쿠 라운드 수 : ");
 	scanf("%d",&set->sudoku_round);
 	
-
-	printf("각 라운드 당 오답 시 감점 점수 : ");
-	scanf("%d",&set->minus_score);
-	
 	printf("\n");
 	return;
 }

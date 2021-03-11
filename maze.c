@@ -194,11 +194,17 @@ int checkAnswer(int mode, Game *game){
 	//정답 확인
 	while (count != 1){
 		
-		if(mode == MULTI){
+		if (mode == MULTI){
 			//플레이어 번호
-			printf("\n플레이어 번호 : ");
+			printf("\n플레이어 번호(-1을 입력 시 게임을 저장하고 종료합니다.) : ");
 			scanf("%d",&player);
 			getchar();
+			
+			if (player == -1){
+				saveGame(game);
+				exit(1);
+			}
+
 			if (game->plus_score[player-1] <= 0){
 				printf("기회가 없습니다.\n");
 				continue;
