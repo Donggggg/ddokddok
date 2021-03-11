@@ -113,7 +113,6 @@ int login(char ID[255], char PW[255]){
 	}
 
 	if(isExist == 0){
-		printf("존재하지 않는 ID입니다\n\n");
 		return -1;
 	}
 

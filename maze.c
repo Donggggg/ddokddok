@@ -4,7 +4,9 @@
 #include "setting.h"
 #include "back_g.h"
 #include "maze.h"
-#include "main.h"
+#define SOLO 1
+#define MULTI 2
+#include <menu.h>
 
 int N;
 int now;
@@ -15,6 +17,36 @@ int wall[51][51];
 int visit[51][51];
 
 xy queue[MAX_QUEUE_SIZE];
+static WINDOW *my_menu_win;
+static void create_Win(int level)
+{
+        initscr();
+        start_color();
+        cbreak();
+        noecho();
+
+        //create main menu window
+        my_menu_win = newwin(6+level, 6+level, 4, 4); 
+        init_pair(1,COLOR_YELLOW,COLOR_GREEN);
+
+        //print title and ddok ddok
+  //      mvwprintw(my_menu_win, 1, 4, "%s", "Maze : Find your path");
+        mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
+        //cero line
+
+
+
+        mvprintw(LINES - 2, 34, "ddok ddok");
+        box(my_menu_win, 0, 0);
+        refresh();
+        wrefresh(my_menu_win);
+        int c;    
+        int flag=0;
+        //while((c = wgetch(my_menu_win)) != 'a');   
+        //endwin();
+}
+
+
 
 //방향 (상 하 좌 우)
 int dx[4] = {0, 0, -1, 1};
@@ -42,10 +74,12 @@ xy dequeue(){
 }
  
 int startMaze(int mode, int level, Game *game){
-	srand(time(NULL));
-	
-	N = 5 + level;
 
+	create_Win(level);
+        
+        srand(time(NULL));
+        	
+	N = 5 + level;
 	//wall배열 최댓값으로 초기화
 	for (int x = 1; x <= N; x++){
 		for (int y = 1; y <= N; y++){
@@ -103,11 +137,21 @@ void makeMaze(){
 	}
 
 	//미로 출력
-	for (int x = 1; x <= N; x++){
+        //
+        int garo=1,cero=3;
+	for (int x = 1; x <= N; x++,garo=1,cero++){
 		for (int y = 1; y <= N; y++){
-			printf("%d", maze[x][y]);
+			//printf("%d", maze[x][y]);
+                        if(maze[x][y]==1)
+                                mvwprintw(my_menu_win,cero,garo++,"X");
+                        else
+                                mvwprintw(my_menu_win,cero,garo++," ");
+
+                                wrefresh(my_menu_win);
+                                refresh();
+
 		}
-		printf("\n");
+		//'printf("\n");
 	}
 }
 

@@ -7,6 +7,5 @@ typedef struct Score{
 } Score;
 
 
-int getch();
 void inputScore(Info *member, double score, int level, int miro_su);
 void printScore();

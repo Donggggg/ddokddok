@@ -7,17 +7,19 @@
 #include "member.h"
 #include "sudoku.h"
 #include "maze.h"
-
 #include "score.h"
-
-
+/*
+Game *game;
+Setting *set;
+Info *player1;
 void soloMode();
 void multiMode();
 
 Game *game; //멀티모드 진행 게임 상황
 Setting *set; //설정 저장
 Info *player1;
-
+*/
+/*
 int main()
 {
 	int input;
@@ -58,8 +60,9 @@ int main()
 	} while (input != 6);
 	
 	return 0;
+    
 }
-
+*/
 void soloMode()
 {
 	int level;

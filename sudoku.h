@@ -28,7 +28,7 @@ void makeSudokuProblem(int);//입력-레벨, 원형에서 랜덤으로 레벨에
 
 int vertical(int,int,int[][9]);		//1*9집합 세로 탐색 > 중복 없으면 TURE
 int horizontal(int,int,int[][9]);	//9*1집합 가로 탐색 > 위와 동일
-int box(int,int,int,int[][9]);		//3*3집합 박스 탐색 > 위와 동일
+int box_sudoku(int,int,int,int[][9]);		//3*3집합 박스 탐색 > 위와 동일
 
 void printSudoku(int[][9]);	//입력 받은 스도쿠 판 출력
 int complete(_Player*);		//스도쿠 완성 시 TRUE 리턴

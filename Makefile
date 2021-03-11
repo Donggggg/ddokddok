@@ -1,8 +1,10 @@
-ddokddok : main.o member.o maze.o sudoku.o setting.o score.o back_g.o
-	gcc main.o member.o maze.o sudoku.o setting.o score.o back_g.o -o ddokddok
+ddokddok : login_test.o menu.o member.o maze.o sudoku_answer.o sudoku.o setting.o score.o back_g.o rank.o select_game.o
+	gcc login_test.o menu.o member.o maze.o sudoku.o setting.o score.o back_g.o rank.o select_game.o sudoku_answer.o -o ddokddok -lncurses -lform -lmenu
 
-main.o : main.c main.h
-	gcc -c main.c
+login_test.o : login_test.c login_test.h
+	gcc -c login_test.c
+menu.o : menu.c
+	gcc -c menu.c
 
 member.o : member.c member.h
 	gcc -c member.c
@@ -21,7 +23,13 @@ score.o : score.c score.h
 
 back_g.o : back_g.c back_g.h
 	gcc -c back_g.c
+rank.o : rank.c rank.h
+	gcc -c rank.c
+select_game.o : select_game.c select_game.h
+	gcc -c select_game.c
 
+sudoku_answer.o : sudoku_answer.c
+	gcc -c sudoku_answer.c
 clean :
 		rm *.o
 		rm ddokddok
