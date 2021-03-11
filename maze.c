@@ -190,14 +190,21 @@ int checkAnswer(int mode, Game *game){
 	else if (maze_check == 0)
 		printf("%d %d", maze_check, wall[N][N]);
 */
-	int player;
+	int player, isGameover;
 	//정답 확인
 	while (count != 1){
 		
-		if(mode == MULTI){
+		if (mode == MULTI){
 			//플레이어 번호
-			printf("플레이어 번호 : ");
-		 	scanf("%d",&player);
+			printf("\n플레이어 번호(-1을 입력 시 게임을 저장하고 종료합니다.) : ");
+			scanf("%d",&player);
+			getchar();
+			
+			if (player == -1){
+				saveGame(game);
+				exit(1);
+			}
+
 			if (game->plus_score[player-1] <= 0){
 				printf("기회가 없습니다.\n");
 				continue;
@@ -209,10 +216,12 @@ int checkAnswer(int mode, Game *game){
 		if (answer.Yes_No == 'O' || answer.Yes_No == 'o'){
 			printf("미로를 탈출하기 위한 최단경로의 길이는? : ");
 			scanf("%d", &answer.num);
+			getchar();
 		}
 		else if (answer.Yes_No == 'X' || answer.Yes_No == 'x'){
 			printf("미로를 탈출하기 위해 뚫어야 하는 벽의 개수는? : ");
 			scanf("%d", &answer.num);
+			getchar();
 		}
 		//정답인지 확인
 		if (maze_check == 1){
@@ -223,13 +232,15 @@ int checkAnswer(int mode, Game *game){
 				else{
 					printf("\n틀렸습니다.\n");
 					wrong++;
-					game->plus_score[player-1] -= 50;
+					if (mode == MULTI)
+						game->plus_score[player-1] -= 50;
 					continue;
 				}
 			}
 			else{
 				printf("\n틀렸습니다.\n");
 				wrong++;
+				if (mode == MULTI)
 					game->plus_score[player-1] -= 50;
 				continue;
 			}
@@ -242,19 +253,34 @@ int checkAnswer(int mode, Game *game){
 				else{
 					printf("\n틀렸습니다.\n");
 					wrong++;
-					game->plus_score[player-1] -= 50;
+					if (mode == MULTI)
+						game->plus_score[player-1] -= 50;
 					continue;
 				}
 			}
 			else{
 				printf("\n틀렸습니다.\n");
 				wrong++;
+				if (mode == MULTI)
 					game->plus_score[player-1] -= 50;
 				continue;
 			}
 		}
+		
+		//모든 플레이어 기회 x
+		if(mode==MULTI){
+			isGameover = 1;
+			for(int k = 0; k<game->people; k++){
+				if(game ->plus_score[k] > 0) isGameover = 0;
+			}
+			if(isGameover){
+				printf("무승부");
+				break;
+			}
+		}
 	}
 	printf("\n정답입니다.\n");
-	game->score[player-1] += game->plus_score[player-1];	
+	if (mode == MULTI)
+		game->score[player-1] += game->plus_score[player-1];	
 	return wrong;
 }

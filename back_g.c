@@ -58,12 +58,12 @@ void setGame(Game *game, Setting *set){ // 새로운 게임 만들기
 
 }
 
-void saveGame(Game game){ //세이브파일 만들기
+void saveGame(Game *game){ //세이브파일 만들기
 	FILE *fp = fopen("back_up.txt","wb");
 	if(fp==NULL)
 		printf("저장하려는 파일에 오류가 있습니다.\n");
 	else{
-		fwrite(&game,sizeof(Game),1,fp);
+		fwrite(game,sizeof(Game),1,fp);
 	}
 	fclose(fp);
 
@@ -71,7 +71,7 @@ void saveGame(Game game){ //세이브파일 만들기
 
 
 int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이 1이면 세이브파일O + 저장
-	FILE *fp1 = fopen("back_up.txt","rb");
+	FILE *fp1 = fopen("back_up.txt","rb+");
 	int check;
 	if(fp1==NULL){
 //		printf("세이브파일에 오류가 있습니다. 죄송합니다\n");
@@ -81,8 +81,9 @@ int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이
 		printf("세이브파일이 존재합니다. 불러오시겠습니까? (1|0)\n");
 		scanf("%d", &check);
 		if(check == 1){
+			rewind(fp1);
 			printf("세이브파일 불러오는 중....\n");
-			fread(&game, sizeof(Game), 1, fp1);
+			fread(game, sizeof(Game), 1, fp1);
 			fclose(fp1);
 			printf("세이브파일 불러오기가 성공했습니다.\n");
 			return 1;

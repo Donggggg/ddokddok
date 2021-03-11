@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "setting.h"
+#include "back_g.h"
 #include "sudoku.h"
 #include "main.h"
 
@@ -324,9 +326,7 @@ void makeSudokuProblem(int level){
 	}
 }
 
-//////////////////////////////////////
-//       입력 시 ui 수정 필요       //
-//////////////////////////////////////
+//저장된 스도쿠 불러오기
 void IN_sudoku(_Player* pop){
 	char ch;
 	getchar();
@@ -338,7 +338,7 @@ void IN_sudoku(_Player* pop){
     }
 }
 
-int playSudoku(int player_num, int level){
+int playSudoku(int mode,int level,Game* game){
 	int input_num = 0, wrong = 0; 	//답 입력 개수
 	int cor = FALSE; 	//정답 여부
 //라운드 별 반복 구간
@@ -347,16 +347,31 @@ int playSudoku(int player_num, int level){
 	makeSudokuProblem(level);
 	printSudoku(sudoku.problem);
 	printSudoku(sudoku.origin);
-
+	
+	int playerNum, isGameover;
 	while(!cor){
+		if(mode == MULTI){
+			printf("\n플레이어 번호 입력: ");
+			scanf(" %d", &playerNum);
+			if(playerNum>game->people||playerNum<0) {
+				printf("잘못된 값입니다.\n");
+				continue;
+			}
+			if(game->plus_score[playerNum-1] <= 0){
+				printf("해당 플레이어는 기회가 없습니다.\n");
+				continue;
+			}
+		}
 		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
 		input_num = correctSudoku(player); //[player_num]);
 		if(input_num == FALSE){		//답이 틀린 경우
 			printf("오답\n");
+			game->plus_score[playerNum-1] -= 50;
 			wrong++;
 		}
 		else if(input_num == -1){	//기존의 주어진 문제를 잘못 입력한 경우
 			printf("오답\n");
+			game->plus_score[playerNum-1] -= 50;
 			wrong++;
 		}
 		//위 두 케이스를 구분할지 말지 정하지 않음
@@ -365,22 +380,39 @@ int playSudoku(int player_num, int level){
 			if(cor) {
 				printf("정답\n");
 				printSudoku(player->sol);
+				game->score[playerNum-1] = game->plus_score[playerNum-1];
+			}
+		}
+		if(mode == MULTI){	
+			isGameover = 1;
+			//모든 플레이어가 점수를 잃었을 때 gameover
+			for(int k = 0; k<game->people; k++){
+				if(game -> plus_score[k] > 0) isGameover = 0;
+			}
+			if(isGameover) {
+				printf("무승부\n");
+				break;
 			}
 		}
 	}
 	return wrong;
 }
 
-int startSudoku(int mode,int level){
+int startSudoku(int mode,int level, Game* game){
+	int w;
 	downloadSudoku();
+	player = (_Player*)malloc(sizeof(_Player)*1);
 	if(mode == SOLO){
-		player = (_Player*)malloc(sizeof(_Player)*1);
-		int w = playSudoku(1,level);
+		w = playSudoku(mode,level,game);
 		free(player);
 		player = NULL;
 		return w;
 	}
 	else if(mode == MULTI){
+		playSudoku(mode,level,game);
+		free(player);
+		player = NULL;
+		return 0;
 	}
 	uploadSudoku();
 }

@@ -4,9 +4,9 @@
 #include "main.h"
 #include "setting.h"
 #include "back_g.h"
-#include "maze.h"
 #include "member.h"
 #include "sudoku.h"
+#include "maze.h"
 
 #include "score.h"
 
@@ -16,16 +16,16 @@ void multiMode();
 
 Game *game; //멀티모드 진행 게임 상황
 Setting *set; //설정 저장
-Info *player;
+Info *player1;
 
 int main()
 {
 	int input;
 	game = malloc(sizeof(Game)); //멀티모드 진행 게임 상황
 	set = malloc(sizeof(Setting)); //설정 저장
-	player = malloc(sizeof(Info)); 
+	player1 = malloc(sizeof(Info)); 
 
-	startLogin(player); //로그인 함수
+	startLogin(player1); //로그인 함수
 
 	do{	
 		printf("1. 1인모드 2. 다인모드 3. 명예의 전당 4. 설정 5. 로그아웃 6. 종료\n");
@@ -46,7 +46,8 @@ int main()
 				setOption(set);
 				break;
 			case 5 : // 로그아웃
-				logout(player);
+				logout(player1);
+				startLogin(player1);
 				break;
 			case 6 : // 종료
 				break;
@@ -83,7 +84,7 @@ void soloMode()
 			printf("점수를 등록하시겠습니까? (1/0)");
 			scanf("%d",&regist);
 			if(regist == 1){
-				inputScore(player, times, level, input);
+				inputScore(player1, times, level, input);
 			}
 
 			break;
@@ -92,16 +93,15 @@ void soloMode()
 			scanf("%d", &level);
 			printf("\n");
 			start = time(NULL);
-			wrong = startSudoku(SOLO,level);
+			wrong = startSudoku(SOLO,level,game);
 			end = time(NULL);
 			times = (double)(end-start) + (double)(wrong*10);
 			printf("점수 : %.2lf\n", times);
 			printf("점수를 등록하시겠습니까? (1/0)");
 			scanf("%d",&regist);
 			if(regist == 1){
-				inputScore(player, times, level, input);
+				inputScore(player1, times, level, input);
 			}
-
 
 			break;
 		default :
@@ -120,8 +120,8 @@ void multiMode()
 	}
 	else{
 		setGame(game, set);	//인자 포인터?
-	
 	}
+
 	int i = 0;
 	while (game->round[0] <= game->round[1]){
 		printf("\n%d라운드입니다\n", game->round[0]);
@@ -133,8 +133,8 @@ void multiMode()
 			startMaze(MULTI,game->round[0],game);
 			game->round[0] += 1;
 		}
-		else if (game->game_select[i] == 0){
-			startSudoku(MULTI, game->round[0]);
+		else if (game->game_select[i] == 2){
+			startSudoku(MULTI, game->round[0],game);
 			game->round[0] += 1;
 		}
 		else{
