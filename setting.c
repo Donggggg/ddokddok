@@ -14,13 +14,14 @@ typedef struct Setting{
 } Setting;
 */
 
-void setOption(Setting *set){
+void setOption(Setting *set, int Miro_round, int Sudoku_round){
 	printf("다인 모드의 미로 라운드 수 : ");
-	scanf("%d",&set->miro_round);
+//	scanf("%d",&set->miro_round);
+	set->miro_round = Miro_round;
 	
 	printf("다인 모드의 스도쿠 라운드 수 : ");
-	scanf("%d",&set->sudoku_round);
-	
+//	scanf("%d",&set->sudoku_round);
+	set->sudoku_round = Sudoku_round;
 	printf("\n");
 	return;
 }

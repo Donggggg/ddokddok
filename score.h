@@ -7,5 +7,6 @@ typedef struct Score{
 } Score;
 
 
-void inputScore(Info *member, double score, int level, int miro_su);
-void printScore();
+void inputScore(Info*, double, int, int);
+//void printScore(in ChooseLank, static char *choices[]);
+// printScore 함수는 rank.c 로 이전함

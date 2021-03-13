@@ -110,6 +110,7 @@ int main()
                                         clear();
                                         break;
                                     case RANK:
+										printScore(1);
                                         show_rank();
                                         clear();
                                         break;

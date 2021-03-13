@@ -22,6 +22,6 @@ typedef struct Game{
 
 } Game;
 
-void setGame(Game *game, Setting *set);
+void setGame(Game *game, Setting *set, int Playmany);
 void saveGame(Game *game);
-int roadGame(Game *game);
+int roadGame(Game *game, int Loadok);

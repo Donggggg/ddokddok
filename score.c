@@ -49,9 +49,115 @@ void inputScore(Info *member, double score, int level, int miro_su){
 	fclose(fp);
 	printf("\n입력이 완료되었습니다.\n\n");
 }
+/*
+void printScore(int ChooseLank, static char *choices[]){
+	Score output[1000]={0,}, temp={0, }; //1000명의 사람을 수용
+	Score miro_out[1000] = {0, }; //미로(1-10)
+	Score sudo_out[1000] = {0, }; //스도쿠(1-10)
+	int miro = 0;
+	int sudo = 0;
+	int N = 0,  go; //갖고오는 사람 수
+	FILE *fp = fopen("score.txt","rb+");
+	if(fp==NULL){
+		printf("파일 오류입니다.\n");
+		return;
+	}
+	printf("\n\n");
+	rewind(fp);
+	while(fread(&output[N],sizeof(Score),1,fp)){
+		N+=1;
+	}
+
+	for(int i=0; i<N-1; i++){ //버블정렬로 파일에서 입력받은 정보들을 소트
+		for(int j=0; j<N-i-1; j++){
+			if(output[j].score>output[j+1].score){
+				strcpy(temp.name,output[j].name);
+				temp.score = output[j].score;
+				temp.level = output[j].level;
+				strcpy(output[j].name, output[j+1].name);
+				output[j].score = output[j+1].score;
+				output[j].level = output[j+1].level;
+				strcpy(output[j+1].name, temp.name);
+				output[j+1].score = temp.score;
+				output[j+1].level = temp.level;
 
 
-void printScore(){
+			}
+		}
+	}	
+
+	
+	for(int i=0; i<N; i++){
+		if(output[i].miro_su == 1){ //미로
+			miro_out[miro] = output[i];
+			miro +=1;
+		}
+		else if(output[i].miro_su == 2){ //스도쿠
+			sudo_out[sudo] = output[i];
+			sudo +=1;
+		}
+	}
+	// miro_out[leve1-1] 이랑 sudo_out[level-1]에 각각 점수별로 저장된다.
+	printf("확인하고 싶은 명예의 전당을 입력하세요 (1=미로, 2=스도쿠) : ");
+//	scanf("%d",&go);
+	go = ChooseLank;
+	getchar(); //enter 입력 getch() 예방
+	int level_leri = 0, rank_updo = 0, key_check, choice_go = 0;
+	char lank[20];
+	
+	//미로 랭킹
+	if(go == 1){ //상위 30명만
+		for(int i = 0; i < 30; i ++){ //30명의
+			for(int j = 0; j < 3; j ++){ //rank, name, score
+				if(choice_go % 3 == 0){ //rank
+					sprintf(lank, "%d위", i+1);
+					strcpy(choices[choice_go], lank);
+				}
+				else if(choice_go % 3 == 1){ //name
+					strcpy(choices[choice_go], miro_out[i].name);
+				}
+				else if(choice_go % 3 == 2){ //score
+					strcpy(choices[choice_go], miro_out[i].score);
+				}
+				choice_go += 1;
+			}
+		}
+	}
+
+	//스도쿠 랭킹
+	else if(go == 2){ //상위 30명만
+		for(int i = 0; i < 30; i ++){ //30명의
+			for(int j = 0; j < 3; j ++){ //rank, name, score
+				if(choice_go % 3 == 0){ //rank
+					sprintf(lank, "%d위", i+1);
+					strcpy(choices[choice_go], lank);
+				}
+				else if(choice_go % 3 == 1){ //name
+					strcpy(choices[choice_go], sudo_out[i].name);
+				}
+				else if(choice_go % 3 == 2){ //score
+					strcpy(choices[choice_go], sudo_out[i].score);
+				}
+				choice_go += 1;
+			}
+		}
+
+
+	}
+
+
+	else{
+		printf("잘못 입력하셨습니다.\n");
+	}
+
+
+}
+*/
+
+
+
+/*
+void printScore(int ChooseLank){
 	Score output[1000]={0,}, temp={0, }; //100명의 사람을 수용
 	Score miro_out[10][100] = {0, }; //미로(1-10)
 	Score sudo_out[10][100] = {0, }; //스도쿠(1-10)
@@ -103,7 +209,8 @@ void printScore(){
 	}
 	// miro_out[leve1-1] 이랑 sudo_out[level-1]에 각각 점수별로 저장된다.
 	printf("확인하고 싶은 명예의 전당을 입력하세요 (1=미로, 2=스도쿠) : ");
-	scanf("%d",&go);
+//	scanf("%d",&go);
+	go = ChooseLank;
 	getchar(); //enter 입력 getch() 예방
 	int level_leri = 0, rank_updo = 0, key_check;
 	
@@ -234,6 +341,7 @@ void printScore(){
 
 
 }
+*/
 
 /*
 int main(){

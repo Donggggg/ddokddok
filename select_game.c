@@ -102,7 +102,7 @@ void select_game()
 			case 10: //enter
                                 { 
                                         char selection=item_name(current_item(my_menu))[0];
-                                        int input,wrong,regist;
+                                        int input,wrong;
                                         double times;
                                         time_t start,end;
                                         flag=1;
@@ -114,8 +114,8 @@ void select_game()
                                             startMaze(1,level,NULL);
                                         end=time(NULL); 
                                         times=(double)(end-start)+(double)(wrong*10);
-                                        if(regist==1)
-                                                inputScore(player1,times,level,input);
+                                    
+                                        inputScore(player1,times,level,input);
                                         break;
                                 }
                     }

@@ -7,4 +7,4 @@ typedef struct Setting{
 
 } Setting;
 
-void setOption(Setting *set);
+void setOption(Setting *set, int Miro_round, int Sudoku_round);

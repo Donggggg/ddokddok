@@ -1,8 +1,11 @@
 #include <curses.h>
 #include <menu.h>
 #include <stdlib.h>
+#include <string.h>
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
+#include "member.h"
+#include "score.h"
 
 static char *choices[] = {
                         "Choice 1", "Choice 2", "Choice 3", "Choice 4", "Choice 5",
@@ -25,8 +28,131 @@ static char *choices[] = {
                         (char *)NULL,
                   };
 
+
+void printScore(int ChooseLank){
+	Score output[500]={0,}, temp={0, }; //1000명의 사람을 수용
+	Score miro_out[500] = {0, }; //미로(1-10)
+	Score sudo_out[500] = {0, }; //스도쿠(1-10)
+	int miro = 0;
+	int sudo = 0;
+	int N = 0,  go; //갖고오는 사람 수
+	FILE *fp = fopen("score.txt","rb+");
+	if(fp==NULL){
+		printf("파일 오류입니다.\n");
+		return;
+	}
+	printf("\n\n");
+	rewind(fp);
+	while(fread(&output[N],sizeof(Score),1,fp)){
+		N+=1;
+	}
+
+	for(int i=0; i<N-1; i++){ //버블정렬로 파일에서 입력받은 정보들을 소트
+		for(int j=0; j<N-i-1; j++){
+			if(output[j].score>output[j+1].score){
+				strcpy(temp.name,output[j].name);
+				temp.score = output[j].score;
+				temp.level = output[j].level;
+				strcpy(output[j].name, output[j+1].name);
+				output[j].score = output[j+1].score;
+				output[j].level = output[j+1].level;
+				strcpy(output[j+1].name, temp.name);
+				output[j+1].score = temp.score;
+				output[j+1].level = temp.level;
+
+
+			}
+		}
+	}	
+
+	
+	for(int i=0; i<N; i++){
+		if(output[i].miro_su == 1){ //미로
+			miro_out[miro] = output[i];
+	//		printf("%d미로이름: %s\n",miro, miro_out[miro].name);
+			miro +=1;
+		}
+		else if(output[i].miro_su == 2){ //스도쿠
+			sudo_out[sudo] = output[i];
+	//		printf("%d스도쿠이름: %s\n",sudo, sudo_out[sudo].name);
+			sudo +=1;
+		}
+	}
+	// 
+//	printf("확인하고 싶은 명예의 전당을 입력하세요 (1=미로, 2=스도쿠) : ");
+//	scanf("%d",&go);
+	go = ChooseLank;
+	int choice_go = 0;
+	char lank[20], strscore[20];
+
+
+	//미로 랭킹
+	if(go == 1){ //상위 30명만
+		for(int i = 0; i < 30; i++){ //30명의
+			for(int j = 0; j < 3; j++){ //rank, name, score
+				if(choice_go % 3 == 0){ //rank
+			//		printf("랭크IN\n");
+					sprintf(lank, "%d위", i+1);
+					choices[choice_go] = malloc(sizeof(char)*10);
+					strcpy(choices[choice_go], lank);
+			//		printf("%s||%s\n", lank, choices[choice_go]);
+				}
+				else if(choice_go % 3 == 1){ //name
+			//		printf("이름IN\n");
+					choices[choice_go] = malloc(sizeof(char)*30);
+					strcpy(choices[choice_go], miro_out[i].name);
+			//		printf("%s||%s\n", miro_out[i].name, choices[choice_go]);
+				}
+				else if(choice_go % 3 == 2){ //score
+			//		printf("점수IN\n");
+					sprintf(strscore, "%.1f", miro_out[i].score);
+					choices[choice_go] = malloc(sizeof(char)*10);
+					strcpy(choices[choice_go], strscore);
+			//		printf("%s||%s\n", strscore, choices[choice_go]);
+				}
+				choice_go += 1;
+			}
+		}
+	}
+
+	//스도쿠 랭킹
+	else if(go == 2){ //상위 30명만
+		for(int i = 0; i < 30; i ++){ //30명의
+			for(int j = 0; j < 3; j ++){ //rank, name, score
+				if(choice_go % 3 == 0){ //rank
+					sprintf(lank, "%d위", i+1);
+					choices[choice_go] = malloc(sizeof(char)*10);
+					strcpy(choices[choice_go], lank);
+				}
+				else if(choice_go % 3 == 1){ //name
+					choices[choice_go] = malloc(sizeof(char)*30);
+					strcpy(choices[choice_go], sudo_out[i].name);
+				}
+				else if(choice_go % 3 == 2){ //score
+					sprintf(strscore, "%.1f", sudo_out[i].score);
+					choices[choice_go] = malloc(sizeof(char)*10);
+					strcpy(choices[choice_go], strscore);
+				}
+				choice_go += 1;
+			}
+		}
+
+
+	}
+
+
+	else{
+		printf("잘못 입력하셨습니다.\n");
+	}
+/*
+	for(int i = 0; i <90; i+=3)
+		printf("%s %s %s\n", choices[i],choices[i+1],choices[i+2]);
+*/
+}
+
 void show_rank()
 {
+
         ITEM **my_items;
 	int c;				
 	MENU *my_menu;
