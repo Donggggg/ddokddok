@@ -16,11 +16,11 @@
 #include "select_game.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
-
+/*
 Game *game; //멀티모드 진행 게임 상황
 Setting *set; //설정 저장
 Info *player1;
-
+*/
 //menu select
 static char *choices[] = {
                         "1. Play Solo",
@@ -40,9 +40,6 @@ int main()
         //login page
         login_UI();
 
-        game = malloc(sizeof(Game)); //멀티모드 진행 게임 상황
-        set = malloc(sizeof(Setting)); //설정 저장
-        player1 = malloc(sizeof(Info)); 
        //menu seletions in MENU
         ITEM **my_items;
 	int c;			

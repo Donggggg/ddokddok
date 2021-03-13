@@ -1,13 +1,21 @@
 #include <menu.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <time.h>
 #include <err.h>
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
 #include "setting.h"
 #include "back_g.h"
+#include "member.h"
 #include "maze.h"
 #include "sudoku.h"
+#include "score.h"
+
+Game *game;
+Setting *set;
+Info *player1;
 //menu select
 static char *choices[] = {
                         "1. SUDOKU",
@@ -19,6 +27,9 @@ static char *choices[] = {
 static void print_logo(WINDOW *my_menu_win);
 void select_game()
 {	
+        game = malloc(sizeof(Game)); //멀티모드 진행 게임 상황
+        set = malloc(sizeof(Setting)); //설정 저장
+        player1 = malloc(sizeof(Info)); 
         //menu seletions in MENU
         ITEM **my_items;
 	int c;			
@@ -91,12 +102,20 @@ void select_game()
 			case 10: //enter
                                 { 
                                         char selection=item_name(current_item(my_menu))[0];
+                                        int input,wrong,regist;
+                                        double times;
+                                        time_t start,end;
                                         flag=1;
                                         clear();
+                                        start=time(NULL);
                                         if(atoi(&selection)==1)
                                             startSudoku(1,level,NULL);
                                         else
                                             startMaze(1,level,NULL);
+                                        end=time(NULL); 
+                                        times=(double)(end-start)+(double)(wrong*10);
+                                        if(regist==1)
+                                                inputScore(player1,times,level,input);
                                         break;
                                 }
                     }

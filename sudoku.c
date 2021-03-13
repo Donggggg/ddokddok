@@ -440,6 +440,7 @@ int playSudoku(int mode,int level,Game* game){
 		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
 		input_num = correctSudoku(player); //[player_num]);
                 mvprintw(LINES-3,34,"input_num: %d",input_num);
+                input_num=1;
 		if(input_num == FALSE){		//답이 틀린 경우
 			mvprintw(LINES-2,34,"INCORRECT");
 			//printf("오답\n");
@@ -455,12 +456,13 @@ int playSudoku(int mode,int level,Game* game){
 		}
 		//위 두 케이스를 구분할지 말지 정하지 않음
 		else{
-			cor = completeSudoku(input_num);
-                        //cor=1;//debug##
+			//cor = completeSudoku(input_num);
+                        cor=1;//debug##
 			if(cor) {
                                 mvprintw(LINES-2,34,"CORRECT");
 				//printSudoku(player->sol);##
-				game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
+                                if(mode==MULTI)
+				    game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
 			}
 		}
 		if(mode == MULTI){	
