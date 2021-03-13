@@ -1,3 +1,4 @@
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -23,20 +24,21 @@ static void create_Win(int level)
         initscr();
         start_color();
         cbreak();
-        noecho();
+ //       noecho();
 
         //create main menu window
-        my_menu_win = newwin(6+level, 6+level, 4, 4); 
-        init_pair(1,COLOR_YELLOW,COLOR_GREEN);
+        my_menu_win = newwin(9+level, 7+level, 10,50 ); 
+        init_pair(1,COLOR_RED,COLOR_YELLOW);
 
         //print title and ddok ddok
-  //      mvwprintw(my_menu_win, 1, 4, "%s", "Maze : Find your path");
+        attron(COLOR_PAIR(1));
+        mvwprintw(my_menu_win, 1, 1, "%s", "Start");
+        attroff(COLOR_PAIR(1));
         mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
         //cero line
 
 
 
-        mvprintw(LINES - 2, 34, "ddok ddok");
         box(my_menu_win, 0, 0);
         refresh();
         wrefresh(my_menu_win);
@@ -141,17 +143,15 @@ void makeMaze(){
         int garo=1,cero=3;
 	for (int x = 1; x <= N; x++,garo=1,cero++){
 		for (int y = 1; y <= N; y++){
-			//printf("%d", maze[x][y]);
                         if(maze[x][y]==1)
-                                mvwprintw(my_menu_win,cero,garo++,"X");
-                        else
                                 mvwprintw(my_menu_win,cero,garo++," ");
+                        else
+                                mvwprintw(my_menu_win,cero,garo++,"X");
 
                                 wrefresh(my_menu_win);
                                 refresh();
 
 		}
-		//'printf("\n");
 	}
 }
 
@@ -235,10 +235,8 @@ int checkAnswer(int mode, Game *game){
 		
 		if (mode == MULTI){
 			//플레이어 번호
-			printf("\n플레이어 번호(-1을 입력 시 게임을 저장하고 종료합니다.) : ");
-			scanf("%d",&player);
-			getchar();
-			
+			mvprintw(LINES-2,34,"플레이어 번호(-1을 입력 시 게임을 저장하고 종료합니다.) : ");
+                        scanw("%d",&player);
 			if (player == -1){
 				saveGame(game);
 				exit(1);
@@ -249,18 +247,27 @@ int checkAnswer(int mode, Game *game){
 				continue;
 			}
 		}
+
+                //##//
+                //##//
 		//답 입력
-		printf("\n탈출이 가능한가요? (O or X) : ");
-		scanf(" %c", &answer.Yes_No);
+		mvprintw(LINES-4,34,"Can escape this maze? (O or X) : ");
+		scanw(" %c", &answer.Yes_No);
+                if(wrong)
+                {
+                        mvprintw(LINES-6,34,"                                       ");
+                        mvprintw(LINES-5,34,"                                       ");
+                }
+                mvprintw(LINES-6,34,"[+]your answer is [%c] ",answer.Yes_No);
 		if (answer.Yes_No == 'O' || answer.Yes_No == 'o'){
-			printf("미로를 탈출하기 위한 최단경로의 길이는? : ");
-	    		scanf("%d", &answer.num);
-			getchar();
+			mvprintw(LINES-3,34,"What is the shortest cost for escaping this maze? : ");
+                        scanw("%d",&answer.num);
+                        mvprintw(LINES-5,34,"[+]your cost is [%d]",answer.num);
 		}
 		else if (answer.Yes_No == 'X' || answer.Yes_No == 'x'){
-			printf("미로를 탈출하기 위해 뚫어야 하는 벽의 개수는? : ");
-			scanf("%d", &answer.num);
-			getchar();
+			mvprintw(LINES-3,34,"What is the number of walls you need to break to break through to escape maze? : ");
+                        scanw("%d",&answer.num);
+                        mvprintw(LINES-5,34,"[+]your cost is [%d]",answer.num);
 		}
 		//정답인지 확인
 		if (maze_check == 1){
@@ -269,7 +276,7 @@ int checkAnswer(int mode, Game *game){
 					count = 1;
 				}
 				else{
-					printf("\n틀렸습니다.\n");
+                                        mvprintw(LINES-2,3,"Your answer is wrong");
 					wrong++;
 					if (mode == MULTI)
 						game->plus_score[player-1] -= 50;
@@ -277,7 +284,7 @@ int checkAnswer(int mode, Game *game){
 				}
 			}
 			else{
-				printf("\n틀렸습니다.\n");
+                                mvprintw(LINES-2,3,"Your answer is wrong");
 				wrong++;
 				if (mode == MULTI)
 					game->plus_score[player-1] -= 50;
@@ -290,7 +297,7 @@ int checkAnswer(int mode, Game *game){
 					count = 1;
 				}
 				else{
-					printf("\n틀렸습니다.\n");
+                                        mvprintw(LINES-2,3,"Your answer is wrong");
 					wrong++;
 					if (mode == MULTI)
 						game->plus_score[player-1] -= 50;
@@ -298,7 +305,7 @@ int checkAnswer(int mode, Game *game){
 				}
 			}
 			else{
-				printf("\n틀렸습니다.\n");
+                                mvprintw(LINES-2,3,"Your answer is wrong");
 				wrong++;
 				if (mode == MULTI)
 					game->plus_score[player-1] -= 50;
@@ -318,8 +325,8 @@ int checkAnswer(int mode, Game *game){
 			}
 		}
 	}
-	printf("\n정답입니다.\n");
+        mvprintw(LINES-2,3,"Your answer is correct");
 	if (mode == MULTI)
-		game->score[player-1] += game->plus_score[player-1];	
+		game->score[player-1] += game->plus_score[player-1];
 	return wrong;
 }

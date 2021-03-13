@@ -93,19 +93,13 @@ void select_game()
                                         char selection=item_name(current_item(my_menu))[0];
                                         flag=1;
                                         clear();
-                                        //free all
-                                        unpost_menu(my_menu);
-                                        free_menu(my_menu);
-                                        for(i = 0; i < n_choices; ++i)
-                                            free_item(my_items[i]);
-	                                endwin();
-                                        clear();
                                         if(atoi(&selection)==1)
                                             startSudoku(1,level,NULL);
-                                        else    startMaze(1,level,NULL);
+                                        else
+                                            startMaze(1,level,NULL);
                                         break;
                                 }
-                                }
+                    }
 			
 
                 if(flag) break;
@@ -115,6 +109,13 @@ void select_game()
         	wrefresh(my_menu_win);
 
 	}
+        //free all
+        unpost_menu(my_menu);
+        free_menu(my_menu);
+        for(i = 0; i < n_choices; ++i)
+            free_item(my_items[i]);
+	endwin();
+        clear();
 		
 }
 static void print_logo(WINDOW *my_menu_win)

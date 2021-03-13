@@ -38,7 +38,7 @@ enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
 int main()
 {
         //login page
-//        login_UI();
+        login_UI();
 
         game = malloc(sizeof(Game)); //멀티모드 진행 게임 상황
         set = malloc(sizeof(Setting)); //설정 저장

@@ -68,9 +68,9 @@ void login_UI()
 			// Or the current field buffer won't be sync with what is displayed
 			form_driver(form, REQ_NEXT_FIELD);
 			form_driver(form, REQ_PREV_FIELD);
-			move(LINES-3, 2);
+			move(LINES-3, 5);
                         /*
-			for (i = 0; fields[i]; i++) {
+		for (i = 0; fields[i]; i++) {
                                 if(field_opts(fields[i])&O_ACTIVE)
                                 {
 				//sprintf(ID,"%s", trim_whitespaces(field_buffer(fields[i], 0)));

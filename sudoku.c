@@ -58,13 +58,11 @@ static void create_Win()
         mvwvline(my_menu_win, 3,42, ACS_VLINE,17);
         
 
-        mvprintw(LINES - 2, 34, "ddok ddok");
         box(my_menu_win, 0, 0); 
         refresh();
         wrefresh(my_menu_win);
         int c;    
         int flag=0;
-        //while((c = wgetch(my_menu_win)) != 'a');   
         endwin();
 }
 int vertical(int n, int x, int arr[][9]){
@@ -122,52 +120,23 @@ int correctSudoku(_Player* pp){
 }
 
 void printSudoku(int sudo_p[][9]){
+    create_Win();
     int tmp[82];
     int idx=0;
     for(int i = 0; i<9; i++){
-        //if(i%3==0)  printf("-------------------------\n");
         for(int j = 0; j<9; j++){
-           // if(j%3==0)  printf("| ");
             if(sudo_p[i][j] == 0)
             {
-                //mvprintw(cero,garo,"*  ");
-		//mvwprintw(my_menu_win,cero,garo,"* ");
-                //garo+=1;
-                //refresh();
-                //wrefresh(my_menu_win);
-                printf("  ");
-                //tmp[idx++]=0; ##############
+                tmp[idx++]=0; //##############
             }
 	    else 
             {
-                //mvprintw(cero,garo,"%d ",sudo_p[i][j]);
-                //mvwprintw(my_menu_win,cero,garo,"%d",sudo_p[i][j]);
-                //garo+=7;
-                //refresh();
-                //wrefresh(my_menu_win);
-                printf("%d ", sudo_p[i][j]);
-                //sprintf(&tmp[idx++],"%d",sudo_p[i][j]);
-                //tmp[idx++]=sudo_p[i][j];########
+                tmp[idx++]=sudo_p[i][j];//########
             }
        }
         printf("\n");
     }
-    /*
-    printf("-------------------------\n");
-    for(int i=0;i<81;i++)
-    {
-        printf("%d ",tmp[i]);
-        if((i!=0)&&(i%9==0))
-                printf("\n");
-    }*/
-    /*int i=0;
-    int garo=3,cero=1;
-    if(tmp[i++]!=0)
-        mvwprintw(my_menu_win,cero,garo++,"%d",tmp[i]);
-    else
-        mvwprintw(my_menu_win,cero,garo++," ");
-        */
-   /* ######################
+   
     int k=3;
     int j=0;
     for(int i=0;i<9;i++,k+=2)
@@ -181,9 +150,7 @@ void printSudoku(int sudo_p[][9]){
     }
     refresh();
     wrefresh(my_menu_win);
-    //int c;
-    //while((c = wgetch(my_menu_win)) != 'a');   
-*/
+
 }
 
 //지정된 두 가로 줄 교환// a,b:서로 다른 3*9집합의 가로 줄 번호(a<b)
@@ -375,8 +342,8 @@ void editSudoku(){
 		for(int j=0; j<9; j++){
 			scanf("%d", &sudoku.origin[i][j]);
 			if(sudoku.origin[i][j] < 1 || sudoku.origin[i][j] > 9){
-				//mvprintw(LINES-2,70,"error: 1부터 9까지의 자연수를 입력하시오.");
-				printf("error: 1부터 9까지의 자연수를 입력하시오.\n");
+				mvprintw(LINES-2,34,"error: 1부터 9까지의 자연수를 입력하시오.");
+				//printf("error: 1부터 9까지의 자연수를 입력하시오.\n");
 				er = 1;
 			}
 		}
@@ -434,23 +401,15 @@ void makeSudokuProblem(int level){
 
 //저장된 스도쿠 불러오기
 void IN_sudoku(_Player* pop){
-	char ch;
-	getchar();
     int k=0;
-    for(int i = 0; i<9; i++){
-        for(int j = 0; j<9;j++){
-            scanf("%1d", &pop->input[i][j]);
-            //pop->input[i][j]=sudoku_answer_int[k++];
-			pop->sol[i][j] = sudoku.problem[i][j];
-		}
+    for(int i = 0; i<9; i++)
+    {
+        for(int j = 0; j<9;j++)
+        {
+            pop->input[i][j]=sudoku_answer_int[k++];
+	    pop->sol[i][j] = sudoku.problem[i][j];
+	}
     }
-    /*
-    endwin();
-    for(int i = 0; i<9; i++){
-        for(int j = 0; j<9;j++){
-            printf("%d",pop->input[i][j]);
-		}
-    }*/
 }
 
 int playSudoku(int mode,int level,Game* game){
@@ -460,8 +419,6 @@ int playSudoku(int mode,int level,Game* game){
 	//문제 생성
 	makeSudokuOrigin();
 	makeSudokuProblem(level);
-	printSudoku(sudoku.problem);
-	printSudoku(sudoku.origin);
 	
 	int playerNum, isGameover;
 	while(!cor){
@@ -477,28 +434,33 @@ int playSudoku(int mode,int level,Game* game){
 				continue;
 			}
 		}
-                //sudoku_answer();
+	        //if(wrong)printSudoku(sudoku.problem);
+	        printSudoku(sudoku.origin);//debug
+                sudoku_answer();
 		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
 		input_num = correctSudoku(player); //[player_num]);
+                mvprintw(LINES-3,34,"input_num: %d",input_num);
 		if(input_num == FALSE){		//답이 틀린 경우
-			//mvprintw(LINES-2,70,"오답");
-			printf("오답\n");
+			mvprintw(LINES-2,34,"INCORRECT");
+			//printf("오답\n");
+                        if(mode==MULTI)
 			game->plus_score[playerNum-1] -= 50;
 			wrong++;
 		}
 		else if(input_num == -1){	//기존의 주어진 문제를 잘못 입력한 경우
-			//mvprintw(LINES-2,70,"오답");
-			printf("오답\n");
+			mvprintw(LINES-2,34,"INCORRECT");
+			//printf("오답\n");
 			game->plus_score[playerNum-1] -= 50;
 			wrong++;
 		}
 		//위 두 케이스를 구분할지 말지 정하지 않음
 		else{
 			cor = completeSudoku(input_num);
+                        //cor=1;//debug##
 			if(cor) {
-				printf("정답\n");
-				printSudoku(player->sol);
-				game->score[playerNum-1] = game->plus_score[playerNum-1];
+                                mvprintw(LINES-2,34,"CORRECT");
+				//printSudoku(player->sol);##
+				game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
 			}
 		}
 		if(mode == MULTI){	
@@ -517,7 +479,6 @@ int playSudoku(int mode,int level,Game* game){
 }
 
 int startSudoku(int mode,int level, Game* game){
-	create_Win();
         int w;
 	downloadSudoku();
 	player = (_Player*)malloc(sizeof(_Player)*1);

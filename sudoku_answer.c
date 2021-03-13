@@ -4,15 +4,15 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <err.h>
-
+#include <stdio.h>//debug
 static char sudoku_answer_psj[82];
-int sudoku_anser_int[81];
+int sudoku_answer_int[81];
 
 static int check_in;
 static FORM *form;
 static FIELD *fields[11];
 static WINDOW *win_body, *win_form;
-static int flag;
+//static int flag;
 static char* trim_whitespaces(char *str);
 static void set_field(FIELD *field[]);
 static void free_all(FORM *form,FIELD *fields[]);
@@ -56,10 +56,10 @@ void sudoku_answer()
         
         //input id and password
 	int ch;
+        int flag=0;
 	while (((ch = getch())))
         {
 	int i;
-
 	switch (ch) {
 		case 10://enter
                         {
@@ -73,29 +73,15 @@ void sudoku_answer()
                         {
                                 strcat(sudoku_answer_psj, trim_whitespaces(field_buffer(fields[i], 0)));
                         }
-                        //mvprintw(30,80,"your answer :%s",sudoku_answer_psj);
-
 			refresh();
 			pos_form_cursor(form);
                         int k=1;
                         int j=40;
                         for(int i=0;i<81;i++,j++)
                         {  
-                            sudoku_anser_int[i]=sudoku_answer_psj[i]-'0';
-                            //sudoku_anser_int[i]=atoi(&sudoku_answer_psj[i]);
-                            //mvprintw(30,j,"%c ",sudoku_answer_psj[i]);
-                            //mvprintw(31,j,"%d ",sudoku_anser_int[i]);
+                            sudoku_answer_int[i]=sudoku_answer_psj[i]-'0';
                         }
-                        //mvprintw(30,80,"%d",sudoku_anser_int[1]);
-                       // int ch;
-	                //while (((ch = getch())))
-
-                        //return;
-	                //while (((ch = getch())))
                         flag=1;
-                        //if(check_in!=-1) flag=1;
-                        //else
-                        //    mvprintw(31,25,"Incorrect!!");
 			break;
                         }
                 case 0x09://tab

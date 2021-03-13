@@ -1,5 +1,5 @@
 ddokddok : login_test.o menu.o member.o maze.o sudoku_answer.o sudoku.o setting.o score.o back_g.o rank.o select_game.o
-	gcc login_test.o menu.o member.o maze.o sudoku.o setting.o score.o back_g.o rank.o select_game.o sudoku_answer.o -o ddokddok -lncurses -lform -lmenu
+	gcc login_test.o menu.o member.o maze.o setting.o score.o back_g.o rank.o select_game.o sudoku_answer.o sudoku.o -o ddokddok -lncurses -lform -lmenu
 
 login_test.o : login_test.c login_test.h
 	gcc -c login_test.c
