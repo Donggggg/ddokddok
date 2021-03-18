@@ -3,10 +3,21 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-//#include "maze.h"
-//#include "sudoku.h"
-#include "setting.h"
 #include "back_g.h"
+
+
+void setOption(Setting *set, int Miro_round, int Sudoku_round){
+	printf("다인 모드의 미로 라운드 수 : ");
+//	scanf("%d",&set->miro_round);
+	set->miro_round = Miro_round;
+	
+	printf("다인 모드의 스도쿠 라운드 수 : ");
+//	scanf("%d",&set->sudoku_round);
+	set->sudoku_round = Sudoku_round;
+	printf("\n");
+	return;
+}
+
 
 void deleteFile(){
 	int dResult = remove("back_up.txt");

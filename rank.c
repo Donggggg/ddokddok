@@ -207,7 +207,7 @@ void show_rank(int game_selection)
         //print border line and title
         box(win, 0, 0);
         mvwprintw(win,0,8,"RANK");	
-        mvwprintw(win,0,20,"ID");	
+        mvwprintw(win,0,20,"NICKNAME");	
         mvwprintw(win,0,32,"SCORE");
 	//print explation at the bottom
         attron(COLOR_PAIR(1));

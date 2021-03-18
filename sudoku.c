@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "setting.h"
@@ -93,8 +93,6 @@ int box_sudoku(int n, int x, int y, int arr[][9]){
 	}
 	return TRUE;
 }
-
-int completeSudoku(int tmp){ return tmp == blank; }
 
 int correctSudoku(_Player* pp){
 	int k, tmp = 0;
@@ -334,22 +332,6 @@ void uploadSudoku(){
 	fclose(fp);
 }
 
-//스도쿠 오류 발생 시 수정
-void editSudoku(){
-	int er = 0;
-	mvprintw(LINES-2,70,"수정할 스도쿠 입력:");
-	for(int i=0; i<9; i++)
-		for(int j=0; j<9; j++){
-			scanf("%d", &sudoku.origin[i][j]);
-			if(sudoku.origin[i][j] < 1 || sudoku.origin[i][j] > 9){
-				mvprintw(LINES-2,34,"error: 1부터 9까지의 자연수를 입력하시오.");
-				//printf("error: 1부터 9까지의 자연수를 입력하시오.\n");
-				er = 1;
-			}
-		}
-	if(er) editSudoku();
-}
-
 void makeSudokuOrigin(){
 	srand(time(NULL));
 	int	r = rand();
@@ -440,7 +422,7 @@ int playSudoku(int mode,int level,Game* game){
 		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
 		input_num = correctSudoku(player); //[player_num]);
                 mvprintw(LINES-3,34,"input_num: %d",input_num);
-                //input_num=1;
+                input_num=1;
 		if(input_num == FALSE){		//답이 틀린 경우
 			mvprintw(LINES-2,34,"INCORRECT");
 			//printf("오답\n");
@@ -456,7 +438,6 @@ int playSudoku(int mode,int level,Game* game){
 		}
 		//위 두 케이스를 구분할지 말지 정하지 않음
 		else{
-			//cor = completeSudoku(input_num);
                         cor=1;//debug##
 			if(cor) {
                                 mvprintw(LINES-2,34,"CORRECT");
@@ -481,20 +462,14 @@ int playSudoku(int mode,int level,Game* game){
 }
 
 int startSudoku(int mode,int level, Game* game){
-        int w;
+    int w;
 	downloadSudoku();
+
 	player = (_Player*)malloc(sizeof(_Player)*1);
-	if(mode == SOLO){
-		w = playSudoku(mode,level,game);
-		free(player);
-		player = NULL;
-		return w;
-	}
-	else if(mode == MULTI){
-		playSudoku(mode,level,game);
-		free(player);
-		player = NULL;
-		return 0;
-	}
+	w = playSudoku(mode,level,game);
+	free(player);
+	player = NULL;
+
 	uploadSudoku();
+	return w;
 }
