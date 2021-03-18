@@ -46,6 +46,7 @@ void printScore(int ChooseLank){
 	while(fread(&output[N],sizeof(Score),1,fp)){
 		N+=1;
 	}
+	fclose(fp);
 
 	for(int i=0; i<N-1; i++){ //버블정렬로 파일에서 입력받은 정보들을 소트
 		for(int j=0; j<N-i-1; j++){
@@ -165,7 +166,9 @@ void printScore(int ChooseLank){
 
 void show_rank()
 {
+		
 		printScore(1);
+
         ITEM **my_items;
 	int c;				
 	MENU *my_menu;

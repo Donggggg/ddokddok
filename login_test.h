@@ -13,4 +13,4 @@ static void driver(int ch);
 static void free_all(FORM *form,FIELD *fields[]);
 static void print_logo(WINDOW *my_menu_win);
 */
-void login_UI();
+void login_UI(Info *player);

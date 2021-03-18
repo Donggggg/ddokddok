@@ -17,16 +17,16 @@ static void set_field(FIELD *field[]);
 static void free_all(FORM *form,FIELD *fields[]);
 static void print_logo(WINDOW *my_menu_win);
 //Info *player;
-void login_UI()
+void login_UI(Info *player)
 {
-        //init window tab
+	//init window tab
 	initscr();
-        start_color();
+	start_color();
 	noecho();
 	cbreak();
 	keypad(stdscr, TRUE);
 
-        //create main window and form window
+	//create main window and form window
 	win_body = newwin(30,70, 4, 4);
 	win_form = derwin(win_body, 20, 60, 4,4 );//20, 60 ,4 ,4
 	mvwprintw(win_body, 1, 15, "Welcome to ddok ddok games");
@@ -40,8 +40,8 @@ void login_UI()
 	set_field_buffer(fields[0], 0, "ID : ");
 	set_field_buffer(fields[2], 0, "PW : ");
 
-        //set field options
-        set_field(fields);
+	//set field options
+	set_field(fields);
 
 	form = new_form(fields);
 
@@ -51,96 +51,98 @@ void login_UI()
 	print_logo(win_body);
 	box(win_body, 0, 0);
 
-        //refresh all
-        refresh();
+	//refresh all
+	refresh();
 	wrefresh(win_body);
 	wrefresh(win_form);
-        
-        //input id and password
+
+	//input id and password
 	int ch;
 	while (((ch = getch())))
-{
-	int i;
+	{
+		int i;
 
-	switch (ch) {
-		case 10://enter
-                        {
-			// Or the current field buffer won't be sync with what is displayed
-			form_driver(form, REQ_NEXT_FIELD);
-			form_driver(form, REQ_PREV_FIELD);
-			move(LINES-3, 5);
-                        /*
-		for (i = 0; fields[i]; i++) {
-                                if(field_opts(fields[i])&O_ACTIVE)
-                                {
-				//sprintf(ID,"%s", trim_whitespaces(field_buffer(fields[i], 0)));
-                                }
-	                        //mvprintw(30, 60, "%s", trim_whitespaces(field_buffer(fields[i],0)));
-                                }
+		switch (ch) {
+			case 10://enter
+				{
+					// Or the current field buffer won't be sync with what is displayed
+					form_driver(form, REQ_NEXT_FIELD);
+					form_driver(form, REQ_PREV_FIELD);
+					move(LINES-3, 5);
+					/*
+					   for (i = 0; fields[i]; i++) {
+					   if(field_opts(fields[i])&O_ACTIVE)
+					   {
+					//sprintf(ID,"%s", trim_whitespaces(field_buffer(fields[i], 0)));
+					}
+					//mvprintw(30, 60, "%s", trim_whitespaces(field_buffer(fields[i],0)));
+					}
 
-                                //if (field_opts(fields[i]) & O_ACTIVE)
-                                //	printw("\"\t");
-				//else
-				//	printw(": \"");
-                                //	*/
-			strcpy(ID, trim_whitespaces(field_buffer(fields[1], 0)));
-			mvprintw(30,20,"ID :%s", ID);
-			strcpy(PW, trim_whitespaces(field_buffer(fields[3], 0)));
-                        mvprintw(30,30," PW: %s",PW);
-			refresh();
-			pos_form_cursor(form);
-                        check_in=login(ID,PW);
-                        //true file offset
-                        //false return -1
-                        if(check_in!=-1) flag=1;
-                        else
-                            mvprintw(31,25,"Incorrect!!");
-			break;
-                        }
-                case 0x09://tab
-                        form_driver(form,REQ_NEXT_FIELD);
-                        form_driver(form,REQ_END_LINE);
-                        break;
-		case KEY_DOWN:
-			form_driver(form, REQ_NEXT_FIELD);
-			form_driver(form, REQ_END_LINE);
-			break;
+					//if (field_opts(fields[i]) & O_ACTIVE)
+					//	printw("\"\t");
+					//else
+					//	printw(": \"");
+					//	*/
+					strcpy(ID, trim_whitespaces(field_buffer(fields[1], 0)));
+					mvprintw(30,20,"ID :%s", ID);
+					strcpy(PW, trim_whitespaces(field_buffer(fields[3], 0)));
+					mvprintw(30,30," PW: %s",PW);
+					refresh();
+					pos_form_cursor(form);
+					check_in=login(ID,PW);
+					*player = login2(check_in);
 
-		case KEY_UP:
-			form_driver(form, REQ_PREV_FIELD);
-			form_driver(form, REQ_END_LINE);
-			break;
+					//true file offset
+					//false return -1
+					if(check_in!=-1) flag=1;
+					else
+						mvprintw(31,25,"Incorrect!!");
+					break;
+				}
+			case 0x09://tab
+				form_driver(form,REQ_NEXT_FIELD);
+				form_driver(form,REQ_END_LINE);
+				break;
+			case KEY_DOWN:
+				form_driver(form, REQ_NEXT_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
 
-		case KEY_LEFT:
-			form_driver(form, REQ_PREV_CHAR);
-			break;
+			case KEY_UP:
+				form_driver(form, REQ_PREV_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
 
-		case KEY_RIGHT:
-			form_driver(form, REQ_NEXT_CHAR);
-			break;
+			case KEY_LEFT:
+				form_driver(form, REQ_PREV_CHAR);
+				break;
 
-		// Delete the char before cursor
-		case KEY_BACKSPACE:
-		case 127:
-			form_driver(form, REQ_DEL_PREV);
-			break;
+			case KEY_RIGHT:
+				form_driver(form, REQ_NEXT_CHAR);
+				break;
 
-		// Delete the char under the cursor
-		case KEY_DC:
-			form_driver(form, REQ_DEL_CHAR);
-			break;
+				// Delete the char before cursor
+			case KEY_BACKSPACE:
+			case 127:
+				form_driver(form, REQ_DEL_PREV);
+				break;
 
-		default:
-			form_driver(form, ch);
-			break;
+				// Delete the char under the cursor
+			case KEY_DC:
+				form_driver(form, REQ_DEL_CHAR);
+				break;
+
+			default:
+				form_driver(form, ch);
+				break;
+		}
+		wrefresh(win_form);
+		if(flag)break;
 	}
-	wrefresh(win_form);
-        if(flag)break;
-}
-        clear();
-        //free all
+	clear();
+	//free all
 	unpost_form(form);
-        free_all(form,fields);
+	free_all(form,fields);
 	delwin(win_form);
 	delwin(win_body);
 	endwin();
@@ -175,7 +177,7 @@ static void set_field(FIELD *field[])
 	set_field_opts(fields[1], O_VISIBLE |O_PUBLIC | O_EDIT | O_ACTIVE);
 	set_field_opts(fields[2], O_VISIBLE | O_PUBLIC | O_AUTOSKIP);
 	set_field_opts(fields[3], O_VISIBLE | O_EDIT | O_ACTIVE);
-        field_opts_off(fields[3],O_PUBLIC);
+	field_opts_off(fields[3],O_PUBLIC);
 	set_field_back(fields[1], A_UNDERLINE);
 	set_field_back(fields[3], A_UNDERLINE);
 }
@@ -190,13 +192,13 @@ static void free_all(FORM *form,FIELD *fields[])
 
 static void print_logo(WINDOW *my_menu_win)
 {
-        char line[255];
+	char line[255];
 	FILE *fp;
-        fp=fopen("test.txt","r");
-        if(fp==NULL)    err(EXIT_FAILURE,"NO test.txt file");
-        int i=12;
-        while(fgets(line,sizeof(line),fp)!=NULL)
-        {
-	        mvwprintw(my_menu_win, i++, 4, "%s", line);
-        }
+	fp=fopen("test.txt","r");
+	if(fp==NULL)    err(EXIT_FAILURE,"NO test.txt file");
+	int i=12;
+	while(fgets(line,sizeof(line),fp)!=NULL)
+	{
+		mvwprintw(my_menu_win, i++, 4, "%s", line);
+	}
 }
