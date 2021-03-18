@@ -89,10 +89,14 @@ void printScore(int ChooseLank){
 	//미로 랭킹
 	if(go == 1){ //상위 30명만
 		for(int i = 0; i < 30; i++){ //30명의
+			if(strcmp(miro_out[i].name, "") == 0){
+				choices[choice_go] = (char *)NULL;
+				break;
+			}
 			for(int j = 0; j < 3; j++){ //rank, name, score
 				if(choice_go % 3 == 0){ //rank
 			//		printf("랭크IN\n");
-					sprintf(lank, "%d위", i+1);
+					sprintf(lank, "%d Rank", i+1);
 					choices[choice_go] = malloc(sizeof(char)*10);
 					strcpy(choices[choice_go], lank);
 			//		printf("%s||%s\n", lank, choices[choice_go]);
@@ -101,6 +105,7 @@ void printScore(int ChooseLank){
 			//		printf("이름IN\n");
 					choices[choice_go] = malloc(sizeof(char)*30);
 					strcpy(choices[choice_go], miro_out[i].name);
+			//		printf("%s||%s\n", lank, choices[choice_go]);
 			//		printf("%s||%s\n", miro_out[i].name, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 2){ //score
@@ -108,6 +113,7 @@ void printScore(int ChooseLank){
 					sprintf(strscore, "%.1f", miro_out[i].score);
 					choices[choice_go] = malloc(sizeof(char)*10);
 					strcpy(choices[choice_go], strscore);
+			//		printf("%s||%s\n", lank, choices[choice_go]);
 			//		printf("%s||%s\n", strscore, choices[choice_go]);
 				}
 				choice_go += 1;
@@ -118,20 +124,27 @@ void printScore(int ChooseLank){
 	//스도쿠 랭킹
 	else if(go == 2){ //상위 30명만
 		for(int i = 0; i < 30; i ++){ //30명의
+			if(strcmp(miro_out[i].name, "") == 0){
+				choices[choice_go] = (char *)NULL;
+				break;
+			}
 			for(int j = 0; j < 3; j ++){ //rank, name, score
 				if(choice_go % 3 == 0){ //rank
-					sprintf(lank, "%d위", i+1);
+					sprintf(lank, "%d Rank", i+1);
 					choices[choice_go] = malloc(sizeof(char)*10);
 					strcpy(choices[choice_go], lank);
+			//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 1){ //name
 					choices[choice_go] = malloc(sizeof(char)*30);
 					strcpy(choices[choice_go], sudo_out[i].name);
+			//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 2){ //score
 					sprintf(strscore, "%.1f", sudo_out[i].score);
 					choices[choice_go] = malloc(sizeof(char)*10);
 					strcpy(choices[choice_go], strscore);
+			//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				choice_go += 1;
 			}
@@ -152,7 +165,7 @@ void printScore(int ChooseLank){
 
 void show_rank()
 {
-
+		printScore(1);
         ITEM **my_items;
 	int c;				
 	MENU *my_menu;
