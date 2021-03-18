@@ -143,7 +143,7 @@ void makeMaze(){
 	for (int x = 1; x <= N; x++,garo=1,cero++){
 		for (int y = 1; y <= N; y++){
                         if(maze[x][y]==1)
-                                mvwprintw(my_menu_win,cero,garo++," ");
+                                mvwprintw(my_menu_win,cero,garo++,"*");
                         else
                                 mvwprintw(my_menu_win,cero,garo++,"X");
 
