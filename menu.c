@@ -14,6 +14,7 @@
 #include "rank.h"
 #include "login_test.h"
 #include "select_game.h"
+#include "select_game_show.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
 /*
@@ -111,7 +112,8 @@ int main()
 						clear();
 						break;
 					case RANK:
-						show_rank();
+			///			show_rank();
+						select_game_show();
 						clear();
 						break;
 					case EXIT:

@@ -1,4 +1,4 @@
-#include <stdio.h>
+
 #include <stdlib.h>
 #include <time.h>
 #include "setting.h"
@@ -440,7 +440,7 @@ int playSudoku(int mode,int level,Game* game){
 		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
 		input_num = correctSudoku(player); //[player_num]);
                 mvprintw(LINES-3,34,"input_num: %d",input_num);
-                input_num=1;
+                //input_num=1;
 		if(input_num == FALSE){		//답이 틀린 경우
 			mvprintw(LINES-2,34,"INCORRECT");
 			//printf("오답\n");

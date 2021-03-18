@@ -1,3 +1,3 @@
-void show_rank();
+void show_rank(int);
 
 void printScore(int ChooseLank);

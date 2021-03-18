@@ -1,5 +1,5 @@
-ddokddok : login_test.o member.o menu.o maze.o sudoku_answer.o sudoku.o setting.o score.o back_g.o rank.o select_game.o
-	gcc login_test.o member.o menu.o maze.o setting.o score.o back_g.o rank.o select_game.o sudoku_answer.o sudoku.o -o ddokddok -lncurses -lform -lmenu
+ddokddok : login_test.o member.o select_game_show.o menu.o maze.o sudoku_answer.o sudoku.o setting.o score.o back_g.o rank.o select_game.o
+	gcc login_test.o member.o select_game_show.o menu.o maze.o setting.o score.o back_g.o rank.o select_game.o sudoku_answer.o sudoku.o -o ddokddok -lncurses -lform -lmenu
 
 login_test.o : login_test.c login_test.h
 	gcc -c login_test.c
@@ -30,6 +30,10 @@ select_game.o : select_game.c select_game.h
 
 sudoku_answer.o : sudoku_answer.c
 	gcc -c sudoku_answer.c
+
+select_game_show.o : select_game_show.c select_game_show.h
+	gcc -c select_game_show.c
+
 clean :
 		rm *.o
 		rm ddokddok

@@ -100,7 +100,9 @@ void select_game(Info *player1)
 			case 10: //enter
 			{ 
 				char selection=item_name(current_item(my_menu))[0];
-				int input = 1,wrong;
+				int input=atoi(&selection), wrong;
+				if(input==1) input+=1;
+				else		input-=1;
 				double times;
 				time_t start,end;
 				flag=1;

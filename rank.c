@@ -88,7 +88,7 @@ void printScore(int ChooseLank){
 
 
 	//미로 랭킹
-	if(go == 1){ //상위 30명만
+	if(go == 2){ //상위 30명만
 		for(int i = 0; i < 30; i++){ //30명의
 			if(strcmp(miro_out[i].name, "") == 0){
 				choices[choice_go] = (char *)NULL;
@@ -111,7 +111,7 @@ void printScore(int ChooseLank){
 				}
 				else if(choice_go % 3 == 2){ //score
 			//		printf("점수IN\n");
-					sprintf(strscore, "%.1f", miro_out[i].score);
+					sprintf(strscore, "%d", miro_out[i].score);
 					choices[choice_go] = malloc(sizeof(char)*10);
 					strcpy(choices[choice_go], strscore);
 			//		printf("%s||%s\n", lank, choices[choice_go]);
@@ -123,9 +123,9 @@ void printScore(int ChooseLank){
 	}
 
 	//스도쿠 랭킹
-	else if(go == 2){ //상위 30명만
+	else if(go == 1){ //상위 30명만
 		for(int i = 0; i < 30; i ++){ //30명의
-			if(strcmp(miro_out[i].name, "") == 0){
+			if(strcmp(sudo_out[i].name, "") == 0){
 				choices[choice_go] = (char *)NULL;
 				break;
 			}
@@ -142,7 +142,7 @@ void printScore(int ChooseLank){
 			//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 2){ //score
-					sprintf(strscore, "%.1f", sudo_out[i].score);
+					sprintf(strscore, "%d", sudo_out[i].score);
 					choices[choice_go] = malloc(sizeof(char)*10);
 					strcpy(choices[choice_go], strscore);
 			//		printf("%s||%s\n", lank, choices[choice_go]);
@@ -164,10 +164,10 @@ void printScore(int ChooseLank){
 */
 }
 
-void show_rank()
+void show_rank(int game_selection)
 {
 		
-		printScore(1);
+		printScore(game_selection);
 
         ITEM **my_items;
 	int c;				

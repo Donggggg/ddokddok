@@ -12,9 +12,7 @@
 #include "maze.h"
 #include "sudoku.h"
 #include "score.h"
-
-Game *game;
-Setting *set;
+#include "rank.h"
 //menu select
 static char *choices[] = {
 	"1. SUDOKU",
@@ -24,10 +22,8 @@ static char *choices[] = {
 
 //print ddok ddok logo
 static void print_logo(WINDOW *my_menu_win);
-void select_game(Info *player1)
+void select_game_show()
 {	
-	game = malloc(sizeof(Game)); //멀티모드 진행 게임 상황
-	set = malloc(sizeof(Setting)); //설정 저장
 	//menu seletions in MENU
 	ITEM **my_items;
 	int c;			
@@ -88,32 +84,15 @@ void select_game(Info *player1)
 			case KEY_UP:
 			menu_driver(my_menu, REQ_UP_ITEM);
 			break;
-			case KEY_LEFT:
-			if(level>1) level-=1;
-			//mvwprintw(my_menu_win,30,8,"%d",level);
-			mvprintw(LINES - 2, 34, "LEVEL : %d              ",level);
-			break;
-			case KEY_RIGHT:
-			if(level<10) level+=1;
-			mvprintw(LINES-2,34,"LEVEL : %d"                 ,level);
-			break; 
 			case 10: //enter
 			{ 
 				char selection=item_name(current_item(my_menu))[0];
-				int input = 1,wrong;
-				double times;
-				time_t start,end;
 				flag=1;
 				clear();
-				start=time(NULL);
 				if(atoi(&selection)==1)
-					startSudoku(1,level,NULL);
+					show_rank(1);
 				else
-					startMaze(1,level,NULL);
-				end=time(NULL); 
-				times=(double)(end-start)+(double)(wrong*10);
-
-				inputScore(player1,times,level,input);
+					show_rank(2);
 				break;
 			}
 		}
@@ -145,3 +124,10 @@ static void print_logo(WINDOW *my_menu_win)
 	while(fgets(line,sizeof(line),fp)!=NULL)
 		mvwprintw(my_menu_win, i++, 4, "%s", line);
 }
+
+
+
+
+
+
+
