@@ -112,6 +112,9 @@ int login(char ID[255], char PW[255]){
 		}
 	}
 
+	if(strcmp("",check_id) == 0)
+		return -1;
+
 	if(isExist == 0){
 		return -1;
 	}

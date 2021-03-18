@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "setting.h"
 #include "back_g.h"
 #include "maze.h"
 #define SOLO 1

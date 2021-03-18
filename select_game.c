@@ -6,7 +6,6 @@
 #include <err.h>
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
-#include "setting.h"
 #include "back_g.h"
 #include "member.h"
 #include "maze.h"

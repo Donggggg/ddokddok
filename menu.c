@@ -3,8 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include "main.h"
-#include "setting.h"
+//#include "main.h"
 #include "back_g.h"
 #include "member.h"
 #include "sudoku.h"

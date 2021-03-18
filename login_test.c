@@ -89,14 +89,18 @@ void login_UI(Info *player)
 					mvprintw(30,30," PW: %s",PW);
 					refresh();
 					pos_form_cursor(form);
+					
 					check_in=login(ID,PW);
-					*player = login2(check_in);
 
 					//true file offset
 					//false return -1
-					if(check_in!=-1) flag=1;
-					else
+					if(check_in != -1){ 
+						*player = login2(check_in);
+						flag=1;
+					}
+					else{
 						mvprintw(31,25,"Incorrect!!");
+					}
 					break;
 				}
 			case 0x09://tab

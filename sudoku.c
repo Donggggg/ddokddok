@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "setting.h"
 #include "back_g.h"
 #include "sudoku.h"
-#include "main.h"
+//#include "main.h"
 #include <menu.h>
 #include "sudoku_answer.h"
 _Sudoku sudoku;
