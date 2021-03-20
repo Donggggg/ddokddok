@@ -38,8 +38,8 @@ enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
 int main()
 {
 	Info *player = malloc(sizeof(Info)); 
-		//login page
-		login_UI(player);
+	//login page
+	login_UI(player);
 
 	//menu seletions in MENU
 	ITEM **my_items;
@@ -107,11 +107,15 @@ int main()
 				{
 					case SOLO:
 						clear();
-						select_game(player);
+						play_solo_mode(player);
 						clear();
 						break;
+					case MULTI:
+						clear();
+						play_multi_mode();
+						break;
 					case RANK:
-			///			show_rank();
+						///			show_rank();
 						select_game_show();
 						clear();
 						break;
@@ -140,6 +144,7 @@ int main()
 		free_item(my_items[i]);
 	endwin();
 }
+
 static void print_logo(WINDOW *my_menu_win)
 {
 	char line[255];

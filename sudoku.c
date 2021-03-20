@@ -16,53 +16,53 @@ int blank = 0;
 static WINDOW *my_menu_win;
 static void create_Win()
 {
-        initscr();
-        start_color();
-        cbreak();
-        noecho();
+	initscr();
+	start_color();
+	cbreak();
+	noecho();
 
-        //create main menu window
-        my_menu_win = newwin(30, 64, 4, 4); 
-        init_pair(1,COLOR_YELLOW,COLOR_GREEN);
+	//create main menu window
+	my_menu_win = newwin(30, 64, 4, 4); 
+	init_pair(1,COLOR_YELLOW,COLOR_GREEN);
 
-        //print title and ddok ddok
-        mvwprintw(my_menu_win, 1, 30, "%s", "Sudoku 9 by 9");
-        mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
-        //cero line
-        
-        for(int k=3;k<20;k++)
-        {
-                mvwprintw(my_menu_win,k,14,".");
-                mvwprintw(my_menu_win,k,7,".");
-                mvwprintw(my_menu_win,k,28,".");
-                mvwprintw(my_menu_win,k,35,".");
-                mvwprintw(my_menu_win,k,49,".");
-                mvwprintw(my_menu_win,k,56,".");
-        }
-        //garo line
-        int j,i;
-        for(i=1,j=4;i<=9;i++,j+=2)
-        {
-                if(i%3==0)
-                {
-                    mvwhline(my_menu_win, j,1, ACS_HLINE, 68);
-                        continue;
-                }
+	//print title and ddok ddok
+	mvwprintw(my_menu_win, 1, 30, "%s", "Sudoku 9 by 9");
+	mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
+	//cero line
 
-                    for(int k=0;k<69;k++)
-                        mvwprintw(my_menu_win,j,k, ".");
-        }
-        //colum line
-        mvwvline(my_menu_win, 3,21, ACS_VLINE,17);
-        mvwvline(my_menu_win, 3,42, ACS_VLINE,17);
-        
+	for(int k=3;k<20;k++)
+	{
+		mvwprintw(my_menu_win,k,14,".");
+		mvwprintw(my_menu_win,k,7,".");
+		mvwprintw(my_menu_win,k,28,".");
+		mvwprintw(my_menu_win,k,35,".");
+		mvwprintw(my_menu_win,k,49,".");
+		mvwprintw(my_menu_win,k,56,".");
+	}
+	//garo line
+	int j,i;
+	for(i=1,j=4;i<=9;i++,j+=2)
+	{
+		if(i%3==0)
+		{
+			mvwhline(my_menu_win, j,1, ACS_HLINE, 68);
+			continue;
+		}
 
-        box(my_menu_win, 0, 0); 
-        refresh();
-        wrefresh(my_menu_win);
-        int c;    
-        int flag=0;
-        endwin();
+		for(int k=0;k<69;k++)
+			mvwprintw(my_menu_win,j,k, ".");
+	}
+	//colum line
+	mvwvline(my_menu_win, 3,21, ACS_VLINE,17);
+	mvwvline(my_menu_win, 3,42, ACS_VLINE,17);
+
+
+	box(my_menu_win, 0, 0); 
+	refresh();
+	wrefresh(my_menu_win);
+	int c;    
+	int flag=0;
+	endwin();
 }
 int vertical(int n, int x, int arr[][9]){
 	for(int i=0; i<9; i++){
@@ -98,7 +98,7 @@ int correctSudoku(_Player* pp){
 	for(int i=0; i<9;i++)
 		for(int j = 0; j<9;j++){
 			if(!sudoku.problem[i][j]){
-			//빈 칸인 경우
+				//빈 칸인 경우
 				k = pp->input[i][j];
 				if(!vertical(k,j,pp->sol) || !horizontal(k,i,pp->sol) || !box_sudoku(k,j,i,pp->sol))
 					return FALSE; //수가 스도쿠 규칙에 위반할 경우 FALSE 리턴
@@ -117,36 +117,36 @@ int correctSudoku(_Player* pp){
 }
 
 void printSudoku(int sudo_p[][9]){
-    create_Win();
-    int tmp[82];
-    int idx=0;
-    for(int i = 0; i<9; i++){
-        for(int j = 0; j<9; j++){
-            if(sudo_p[i][j] == 0)
-            {
-                tmp[idx++]=0; //##############
-            }
-	    else 
-            {
-                tmp[idx++]=sudo_p[i][j];//########
-            }
-       }
-        printf("\n");
-    }
-   
-    int k=3;
-    int j=0;
-    for(int i=0;i<9;i++,k+=2)
-    {
-        for(int a=3;a<60;a+=7,j++)
-        {
-            if(tmp[j]!=0)
-                mvwprintw(my_menu_win,k,a,"%d",tmp[j]);
-        }
-        
-    }
-    refresh();
-    wrefresh(my_menu_win);
+	create_Win();
+	int tmp[82];
+	int idx=0;
+	for(int i = 0; i<9; i++){
+		for(int j = 0; j<9; j++){
+			if(sudo_p[i][j] == 0)
+			{
+				tmp[idx++]=0; //##############
+			}
+			else 
+			{
+				tmp[idx++]=sudo_p[i][j];//########
+			}
+		}
+		printf("\n");
+	}
+
+	int k=3;
+	int j=0;
+	for(int i=0;i<9;i++,k+=2)
+	{
+		for(int a=3;a<60;a+=7,j++)
+		{
+			if(tmp[j]!=0)
+				mvwprintw(my_menu_win,k,a,"%d",tmp[j]);
+		}
+
+	}
+	refresh();
+	wrefresh(my_menu_win);
 
 }
 
@@ -212,41 +212,41 @@ void tradeAll(){
 void rotation(){
 	int tmp;
 	switch(ran%3){
-	case 0:
-		//90도 회전
-		for(int a = 0; a<5; a++)
-			for(int b = 0; b<4; b++){
-				tmp = sudoku.origin[a][b];
-				sudoku.origin[a][b] = sudoku.origin[b][8-a];
-				sudoku.origin[b][8-a] = sudoku.origin[8-a][8-b];
-				sudoku.origin[8-a][8-b] = sudoku.origin[8-b][a];
-				sudoku.origin[8-b][a] = tmp;
-			}
-		break;
-	case 1:
-		//180도 회전
-		for(int a = 0; a<5; a++)
-			for(int b = 0; b<4; b++){
-				tmp = sudoku.origin[a][b];
-				sudoku.origin[a][b] = sudoku.origin[8-a][8-b];
-				sudoku.origin[8-a][8-b] = tmp;
-				tmp = sudoku.origin[8-b][a];
-				sudoku.origin[8-b][a] = sudoku.origin[b][8-a];
-				sudoku.origin[b][8-a] = tmp;
-			}
-		break;
-	case 2:
-		//270도 회전
-		for(int a = 0; a<5; a++)
-			for(int b = 0; b<4; b++){
-				tmp = sudoku.origin[a][b];
-				sudoku.origin[a][b] = sudoku.origin[8-b][a];
-				sudoku.origin[8-b][a] = sudoku.origin[8-a][8-b];
-				sudoku.origin[8-a][8-b] = sudoku.origin[b][8-a];
-				sudoku.origin[b][8-a] = tmp;
-			}
-		break;
-	default:break;
+		case 0:
+			//90도 회전
+			for(int a = 0; a<5; a++)
+				for(int b = 0; b<4; b++){
+					tmp = sudoku.origin[a][b];
+					sudoku.origin[a][b] = sudoku.origin[b][8-a];
+					sudoku.origin[b][8-a] = sudoku.origin[8-a][8-b];
+					sudoku.origin[8-a][8-b] = sudoku.origin[8-b][a];
+					sudoku.origin[8-b][a] = tmp;
+				}
+			break;
+		case 1:
+			//180도 회전
+			for(int a = 0; a<5; a++)
+				for(int b = 0; b<4; b++){
+					tmp = sudoku.origin[a][b];
+					sudoku.origin[a][b] = sudoku.origin[8-a][8-b];
+					sudoku.origin[8-a][8-b] = tmp;
+					tmp = sudoku.origin[8-b][a];
+					sudoku.origin[8-b][a] = sudoku.origin[b][8-a];
+					sudoku.origin[b][8-a] = tmp;
+				}
+			break;
+		case 2:
+			//270도 회전
+			for(int a = 0; a<5; a++)
+				for(int b = 0; b<4; b++){
+					tmp = sudoku.origin[a][b];
+					sudoku.origin[a][b] = sudoku.origin[8-b][a];
+					sudoku.origin[8-b][a] = sudoku.origin[8-a][8-b];
+					sudoku.origin[8-a][8-b] = sudoku.origin[b][8-a];
+					sudoku.origin[b][8-a] = tmp;
+				}
+			break;
+		default:break;
 	}
 }
 
@@ -305,7 +305,7 @@ void tradeNumber(){
 }
 
 //void removeNum(int level, int weight){
-	
+
 
 //파일 입출력을 통해 좋은 예시의 스도쿠 원형을 받음
 void downloadSudoku(){
@@ -382,25 +382,25 @@ void makeSudokuProblem(int level){
 
 //저장된 스도쿠 불러오기
 void IN_sudoku(_Player* pop){
-    int k=0;
-    for(int i = 0; i<9; i++)
-    {
-        for(int j = 0; j<9;j++)
-        {
-            pop->input[i][j]=sudoku_answer_int[k++];
-	    pop->sol[i][j] = sudoku.problem[i][j];
+	int k=0;
+	for(int i = 0; i<9; i++)
+	{
+		for(int j = 0; j<9;j++)
+		{
+			pop->input[i][j]=sudoku_answer_int[k++];
+			pop->sol[i][j] = sudoku.problem[i][j];
+		}
 	}
-    }
 }
 
 int playSudoku(int mode,int level,Game* game){
 	int input_num = 0, wrong = 0; 	//답 입력 개수
 	int cor = FALSE; 	//정답 여부
-//라운드 별 반복 구간
+	//라운드 별 반복 구간
 	//문제 생성
 	makeSudokuOrigin();
 	makeSudokuProblem(level);
-	
+
 	int playerNum, isGameover;
 	while(!cor){
 		if(mode == MULTI){
@@ -415,18 +415,18 @@ int playSudoku(int mode,int level,Game* game){
 				continue;
 			}
 		}
-	        //if(wrong)printSudoku(sudoku.problem);
-	        printSudoku(sudoku.origin);//debug
-                sudoku_answer();
+		//if(wrong)printSudoku(sudoku.problem);
+		printSudoku(sudoku.origin);//debug
+		sudoku_answer();
 		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
 		input_num = correctSudoku(player); //[player_num]);
-                mvprintw(LINES-3,34,"input_num: %d",input_num);
-                input_num=1;
+		mvprintw(LINES-3,34,"input_num: %d",input_num);
+		input_num=1;
 		if(input_num == FALSE){		//답이 틀린 경우
 			mvprintw(LINES-2,34,"INCORRECT");
 			//printf("오답\n");
-                        if(mode==MULTI)
-			game->plus_score[playerNum-1] -= 50;
+			if(mode==MULTI)
+				game->plus_score[playerNum-1] -= 50;
 			wrong++;
 		}
 		else if(input_num == -1){	//기존의 주어진 문제를 잘못 입력한 경우
@@ -437,12 +437,12 @@ int playSudoku(int mode,int level,Game* game){
 		}
 		//위 두 케이스를 구분할지 말지 정하지 않음
 		else{
-                        cor=1;//debug##
+			cor=1;//debug##
 			if(cor) {
-                                mvprintw(LINES-2,34,"CORRECT");
+				mvprintw(LINES-2,34,"CORRECT");
 				//printSudoku(player->sol);##
-                                if(mode==MULTI)
-				    game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
+				if(mode==MULTI)
+					game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
 			}
 		}
 		if(mode == MULTI){	
@@ -461,7 +461,7 @@ int playSudoku(int mode,int level,Game* game){
 }
 
 int startSudoku(int mode,int level, Game* game){
-    int w;
+	int w;
 	downloadSudoku();
 
 	player = (_Player*)malloc(sizeof(_Player)*1);
