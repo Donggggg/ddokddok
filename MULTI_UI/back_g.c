@@ -9,11 +9,13 @@
 void setOption(Setting *set){
 	mvprintw(11,34,"INPUT MIRO ROUND : ");
 	scanw(" %d",&set->miro_round);
-//	set->miro_round = Miro_round;
-	
+	mvprintw(11, 53, "%d", set->miro_round);
+	//	set->miro_round = Miro_round;
+
 	mvprintw(12,34,"INPUT SUDOKU ROUND : ");
 	scanw(" %d",&set->sudoku_round);
-//	set->sudoku_round = Sudoku_round;
+	mvprintw(12, 55, "%d", set->sudoku_round);
+	//	set->sudoku_round = Sudoku_round;
 	return;
 }
 
@@ -25,7 +27,7 @@ void deleteFile(){
 void setGame(Game *game){ // 새로운 게임 만들기
 	mvprintw(10,34, "HOW MANY PLAYER(MAXIMUN 5)  : ");
 	scanw(" %d",&game->people);
-//	game->people = Playmany;
+	mvprintw(10, 63, "%d", game->people);
 
 	Setting *set = malloc(sizeof(Setting));
 	setOption(set);
@@ -52,12 +54,12 @@ void setGame(Game *game){ // 새로운 게임 만들기
 		else
 			i-=1; //다시 반복
 	}
-	mvprintw(15,34,"ORDER IS....");
+	mvprintw(16,34,"ORDER IS....");
 	for(int i = 0; i < game->round[1]; i++){
 		if(game->game_select[i] == 1) // 17 18 19 20 21
 			mvprintw(i+17,34,"%d round : MIRO ROUND",i+1);
 		else if(game->game_select[i] == 2)
-			mvprintw(i+9,34,"%d round : SUDOKU ROUND",i+1);
+			mvprintw(i+17,34,"%d round : SUDOKU ROUND",i+1);
 	}
 
 	mvprintw(25,34,"Let's start Game!!");
@@ -85,13 +87,13 @@ int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이
 	FILE *fp1 = fopen("back_up.txt","rb+");
 	int check;
 	if(fp1==NULL){
-//		mvprintw(LINES-6,34,"세이브파일에 오류가 있습니다. 죄송합니다\n");
+		//		mvprintw(LINES-6,34,"세이브파일에 오류가 있습니다. 죄송합니다\n");
 		return 0;
 	}
 	else{
 		mvprintw(2,34,"We have a Savefile. Road it? (1|0)\n");
 		scanw("%d", &check);
-	//	check = Loadok;
+		//	check = Loadok;
 		if(check == 1){
 			rewind(fp1);
 			mvprintw(4,34,"Road savefile....\n");
@@ -111,13 +113,13 @@ int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이
 
 
 /*
-int main(){ //새 게임을 시작하거나 기존 게임을 불러오는 경우 세이브파일 삭제
+   int main(){ //새 게임을 시작하거나 기존 게임을 불러오는 경우 세이브파일 삭제
 
-	srand(time(NULL));
+   srand(time(NULL));
 
-	Game game = {0, };
-	Setting set = {3, 2, 1, 10}; //미로 3라운드 스도쿠 2라운드 기본 레벨 1 감점 10
-	setGame(&game, &set);
+   Game game = {0, };
+   Setting set = {3, 2, 1, 10}; //미로 3라운드 스도쿠 2라운드 기본 레벨 1 감점 10
+   setGame(&game, &set);
 
-}
-*/
+   }
+ */

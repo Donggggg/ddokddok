@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <time.h>
 #include "back_g.h"
 #include "maze.h"
@@ -20,31 +21,31 @@ xy queue[MAX_QUEUE_SIZE];
 static WINDOW *my_menu_win;
 static void create_Win(int level)
 {
-        initscr();
-        start_color();
-        cbreak();
- //       noecho();
+	initscr();
+	start_color();
+	cbreak();
+	//       noecho();
 
-        //create main menu window
-        my_menu_win = newwin(9+level, 7+level, 10,50 ); 
-        init_pair(1,COLOR_RED,COLOR_YELLOW);
+	//create main menu window
+	my_menu_win = newwin(9+level, 7+level, 10,50 ); 
+	init_pair(1,COLOR_RED,COLOR_YELLOW);
 
-        //print title and ddok ddok
-        attron(COLOR_PAIR(1));
-        mvwprintw(my_menu_win, 1, 1, "%s", "Start");
-        attroff(COLOR_PAIR(1));
-        mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
-        //cero line
+	//print title and ddok ddok
+	attron(COLOR_PAIR(1));
+	mvwprintw(my_menu_win, 1, 1, "%s", "Start");
+	attroff(COLOR_PAIR(1));
+	mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
+	//cero line
 
 
 
-        box(my_menu_win, 0, 0);
-        refresh();
-        wrefresh(my_menu_win);
-        int c;    
-        int flag=0;
-        //while((c = wgetch(my_menu_win)) != 'a');   
-        //endwin();
+	box(my_menu_win, 0, 0);
+	refresh();
+	wrefresh(my_menu_win);
+	int c;    
+	int flag=0;
+	//while((c = wgetch(my_menu_win)) != 'a');   
+	//endwin();
 }
 
 
@@ -73,13 +74,13 @@ xy dequeue(){
 	front = front % MAX_QUEUE_SIZE;
 	return queue[front++];
 }
- 
+
 int startMaze(int mode, int level, Game *game){
 
 	create_Win(level);
-        
-        srand(time(NULL));
-        	
+
+	srand(time(NULL));
+
 	N = 5 + level;
 	//wall배열 최댓값으로 초기화
 	for (int x = 1; x <= N; x++){
@@ -89,7 +90,7 @@ int startMaze(int mode, int level, Game *game){
 	}
 
 	if(mode == SOLO){
-		
+
 
 		makeMaze();
 
@@ -100,7 +101,7 @@ int startMaze(int mode, int level, Game *game){
 		shortDistance(1, 1);
 		enqueue(1, 1);
 		breakWall(1, 1);
-		
+
 		return 	checkAnswer(mode, game);
 	}
 	else if(mode == MULTI){
@@ -121,7 +122,7 @@ int startMaze(int mode, int level, Game *game){
 
 //미로 출력 함수
 void makeMaze(){
-	
+
 	//미로 받는 부분
 	for (int x = 1; x <= N; x++){
 		for (int y = 1; y <= N; y++){
@@ -138,17 +139,17 @@ void makeMaze(){
 	}
 
 	//미로 출력
-        //
-        int garo=1,cero=3;
+	//
+	int garo=1,cero=3;
 	for (int x = 1; x <= N; x++,garo=1,cero++){
 		for (int y = 1; y <= N; y++){
-                        if(maze[x][y]==1)
-                                mvwprintw(my_menu_win,cero,garo++,"*");
-                        else
-                                mvwprintw(my_menu_win,cero,garo++,"X");
+			if(maze[x][y]==1)
+				mvwprintw(my_menu_win,cero,garo++,"*");
+			else
+				mvwprintw(my_menu_win,cero,garo++,"X");
 
-                                wrefresh(my_menu_win);
-                                refresh();
+			wrefresh(my_menu_win);
+			refresh();
 
 		}
 	}
@@ -168,7 +169,7 @@ void breakWall(int x, int y){
 			if (nx < 1 || nx > N || ny < 1 || ny > N){
 				continue;
 			}
-			
+
 			//벽인 경우
 			if (maze[nx][ny] == 0){
 				if (wall[nx][ny] > wall[pop.x][pop.y] + 1){
@@ -231,11 +232,12 @@ int checkAnswer(int mode, Game *game){
 	int player, isGameover;
 	//정답 확인
 	while (count != 1){
-		
+
 		if (mode == MULTI){
 			//플레이어 번호
 			mvprintw(LINES-2,34,"Input Player Number(If save input -1): ");
-                        scanw("%d",&player);
+			scanw("%d",&player);
+			mvprintw(LINES-2,72,"%d", player);
 			if (player == -1){
 				saveGame(game);
 				exit(1);
@@ -247,26 +249,29 @@ int checkAnswer(int mode, Game *game){
 			}
 		}
 
-                //##//
-                //##//
+		//##//
+		//##//
 		//답 입력
 		mvprintw(LINES-4,34,"Can escape this maze? (O or X) : ");
 		scanw(" %c", &answer.Yes_No);
-                if(wrong)
-                {
-                        mvprintw(LINES-6,34,"                                       ");
-                        mvprintw(LINES-5,34,"                                       ");
-                }
-                mvprintw(LINES-6,34,"[+]your answer is [%c] ",answer.Yes_No);
+		mvprintw(LINES-4, 67,"%c", answer.Yes_No);
+		if(wrong)
+		{
+			mvprintw(LINES-6,34,"                                       ");
+			mvprintw(LINES-5,34,"                                       ");
+		}
+		//mvprintw(LINES-6,34,"[+]your answer is [%c] ",answer.Yes_No);
 		if (answer.Yes_No == 'O' || answer.Yes_No == 'o'){
 			mvprintw(LINES-3,34,"What is the shortest cost for escaping this maze? : ");
-                        scanw("%d",&answer.num);
-                        mvprintw(LINES-5,34,"[+]your cost is [%d]",answer.num);
+			scanw("%d",&answer.num);
+			mvprintw(LINES-3,86,"%d", answer.num);
+			//mvprintw(LINES-5,34,"[+]your cost is [%d]",answer.num);
 		}
 		else if (answer.Yes_No == 'X' || answer.Yes_No == 'x'){
 			mvprintw(LINES-3,34,"What is the number of walls you need to break to break through to escape maze? : ");
-                        scanw("%d",&answer.num);
-                        mvprintw(LINES-5,34,"[+]your cost is [%d]",answer.num);
+			scanw("%d",&answer.num);
+			mvprintw(LINES-3,115, "%d", answer.num);
+			//mvprintw(LINES-5,34,"[+]your cost is [%d]",answer.num);
 		}
 		//정답인지 확인
 		if (maze_check == 1){
@@ -275,7 +280,7 @@ int checkAnswer(int mode, Game *game){
 					count = 1;
 				}
 				else{
-                                        mvprintw(LINES-2,3,"Your answer is wrong");
+					mvprintw(LINES-2,34,"Your answer is wrong");
 					wrong++;
 					if (mode == MULTI)
 						game->plus_score[player-1] -= 50;
@@ -283,7 +288,7 @@ int checkAnswer(int mode, Game *game){
 				}
 			}
 			else{
-                                mvprintw(LINES-2,3,"Your answer is wrong");
+				mvprintw(LINES-2,34,"Your answer is wrong");
 				wrong++;
 				if (mode == MULTI)
 					game->plus_score[player-1] -= 50;
@@ -296,7 +301,7 @@ int checkAnswer(int mode, Game *game){
 					count = 1;
 				}
 				else{
-                                        mvprintw(LINES-2,3,"Your answer is wrong");
+					mvprintw(LINES-2,34,"Your answer is wrong");
 					wrong++;
 					if (mode == MULTI)
 						game->plus_score[player-1] -= 50;
@@ -304,14 +309,14 @@ int checkAnswer(int mode, Game *game){
 				}
 			}
 			else{
-                                mvprintw(LINES-2,3,"Your answer is wrong");
+				mvprintw(LINES-2,34,"Your answer is wrong");
 				wrong++;
 				if (mode == MULTI)
 					game->plus_score[player-1] -= 50;
 				continue;
 			}
 		}
-		
+
 		//모든 플레이어 기회 x
 		if(mode==MULTI){
 			isGameover = 1;
@@ -324,8 +329,10 @@ int checkAnswer(int mode, Game *game){
 			}
 		}
 	}
-        mvprintw(LINES-2,3,"Your answer is correct");
+	mvprintw(LINES-2,34,"Your answer is correct!!!!!!!!!!!!!!!!");
 	if (mode == MULTI)
 		game->score[player-1] += game->plus_score[player-1];
+	refresh();
+	sleep(3);
 	return wrong;
 }
