@@ -1,19 +1,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "back_g.h"
-#include "sudoku.h"
-//#include "main.h"
+#include <assert.h>
+#include <string.h>
+#include <ctype.h>
+#include <err.h>
 #include <menu.h>
-#include "sudoku_answer.h"
-_Sudoku sudoku;
-_Player* player;
+#include <form.h>
+#include "save.h"
+#include "sudoku.h"
+
 #define SOLO 1
 #define MULTI 2
-int ran;
-int blank = 0;
 
+int ran, blank = 0;
+int sudoku_answer_int[81];
+_Sudoku sudoku;
+_Player* player;
+
+static char sudoku_answer_psj[82];
+int sudoku_answer_int[81];
+
+static int check_in;
+static FORM *form;
+static FIELD *fields[11];
+static WINDOW *win_body, *win_form;
 static WINDOW *my_menu_win;
+
+//static int flag;
+static char* trim_whitespaces(char *str);
+static void set_field(FIELD *field[]);
+static void free_all(FORM *form,FIELD *fields[]);
+
 static void create_Win()
 {
 	initscr();
@@ -64,6 +82,20 @@ static void create_Win()
 	int flag=0;
 	endwin();
 }
+
+int startSudoku(int mode,int level, Game* game){
+	int w;
+	downloadSudoku();
+
+	player = (_Player*)malloc(sizeof(_Player)*1);
+	w = playSudoku(mode,level,game);
+	free(player);
+	player = NULL;
+
+	uploadSudoku();
+	return w;
+}
+
 int vertical(int n, int x, int arr[][9]){
 	for(int i=0; i<9; i++){
 		if(arr[i][x] == n){
@@ -100,16 +132,18 @@ int correctSudoku(_Player* pp){
 			if(!sudoku.problem[i][j]){
 				//빈 칸인 경우
 				k = pp->input[i][j];
-				if(!vertical(k,j,pp->sol) || !horizontal(k,i,pp->sol) || !box_sudoku(k,j,i,pp->sol))
+				if(!vertical(k,j,pp->sol) || !horizontal(k,i,pp->sol) || !box_sudoku(k,j,i,pp->sol)){
 					return FALSE; //수가 스도쿠 규칙에 위반할 경우 FALSE 리턴
+				}
 				else {
 					pp->sol[i][j] = k;
 					tmp++;
 				}
 			}
 			else {
-				if(sudoku.problem[i][j] != pp->input[i][j]) 
+				if(sudoku.problem[i][j] != pp->input[i][j]) {
 					return FALSE;
+				}
 			}
 			//이미 주어진 숫자를 잘못 입력한 경우 오류 메시지 출력 및 -1리턴
 		}
@@ -131,7 +165,7 @@ void printSudoku(int sudo_p[][9]){
 				tmp[idx++]=sudo_p[i][j];//########
 			}
 		}
-		printf("\n");
+	//	printf("\n");
 	}
 
 	int k=3;
@@ -387,7 +421,8 @@ void IN_sudoku(_Player* pop){
 	{
 		for(int j = 0; j<9;j++)
 		{
-			pop->input[i][j]=sudoku_answer_int[k++];
+			//pop->input[i][j]=sudoku_answer_int[k++];
+			pop->input[i][j]=sudoku.origin[i][j];
 			pop->sol[i][j] = sudoku.problem[i][j];
 		}
 	}
@@ -401,28 +436,51 @@ int playSudoku(int mode,int level,Game* game){
 	makeSudokuOrigin();
 	makeSudokuProblem(level);
 
+	printSudoku(sudoku.origin); // 문제 출력
 	int playerNum, isGameover;
 	while(!cor){
 		if(mode == MULTI){
-			printf("\n플레이어 번호 입력: ");
-			scanf(" %d", &playerNum);
+			saveGame(game); // 현재 상태 세이브
+			mvprintw(LINES-2,34,"Input Player Number : ");
+			scanw("%d", &playerNum);
+			mvprintw(LINES-2, 73,"%d", playerNum);
+
 			if(playerNum>game->people||playerNum<0) {
-				printf("잘못된 값입니다.\n");
+				mvprintw(LINES-2,34,"Wrong INPUT.");
 				continue;
 			}
+
 			if(game->plus_score[playerNum-1] <= 0){
-				printf("해당 플레이어는 기회가 없습니다.\n");
+				//printf("NO chance");
 				continue;
 			}
 		}
-		//if(wrong)printSudoku(sudoku.problem);
-		printSudoku(sudoku.origin);//debug
-		sudoku_answer();
-		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
-		input_num = correctSudoku(player); //[player_num]);
-		mvprintw(LINES-3,34,"input_num: %d",input_num);
+
+		sudoku_answer(); // 정답 입력 UI 출력
+		IN_sudoku(player); // 정답 검증 준비
+
+		/*
+		 //스도쿠 검증 디버깅 코드
+		   for(int a=0;a<9;a++){
+		   for(int b=0;b<9;b++){
+		   printf("%d ", player->input[a][b]);
+		   }
+		   printf("\n");
+		   }
+		   printf("---------------------------\n");
+		   for(int a=0;a<9;a++){
+		   for(int b=0;b<9;b++){
+		   printf("%d ", player->sol[a][b]);
+		   }
+		   printf("\n");
+		   }
+		 */
+
+		input_num = correctSudoku(player); // 정답 검증
+	//	mvprintw(LINES-3,34,"input_num: %d",input_num);
 		input_num=1;
-		if(input_num == FALSE){		//답이 틀린 경우
+
+		if(input_num == FALSE){	//답이 틀린 경우
 			mvprintw(LINES-2,34,"INCORRECT");
 			//printf("오답\n");
 			if(mode==MULTI)
@@ -445,6 +503,7 @@ int playSudoku(int mode,int level,Game* game){
 					game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
 			}
 		}
+
 		if(mode == MULTI){	
 			isGameover = 1;
 			//모든 플레이어가 점수를 잃었을 때 gameover
@@ -457,18 +516,165 @@ int playSudoku(int mode,int level,Game* game){
 			}
 		}
 	}
+
 	return wrong;
 }
 
-int startSudoku(int mode,int level, Game* game){
-	int w;
-	downloadSudoku();
 
-	player = (_Player*)malloc(sizeof(_Player)*1);
-	w = playSudoku(mode,level,game);
-	free(player);
-	player = NULL;
+void sudoku_answer()
+{
+	//init window tab
+	initscr();
+	start_color();
+	noecho();
+	cbreak();
+	keypad(stdscr, TRUE);
 
-	uploadSudoku();
-	return w;
+	//create main window and form window
+	win_body = newwin(30,70, 4, 70);
+	win_form = derwin(win_body, 20, 60, 4,4 );//20, 60 ,4 ,4
+	mvwprintw(win_body, 1, 15, "Write your answers");
+	//declare filed location
+	fields[0] = new_field(1, 10, 0, 10, 0, 0);
+	for(int i=1,k=2;i<10;i++,k+=2)
+	{
+		fields[i] = new_field(1, 40, k, 15, 0, 0);
+	}
+	fields[10] = NULL;
+
+	set_field_buffer(fields[0], 0, "Input : ");
+
+	//set field options
+	set_field(fields);
+	form = new_form(fields);
+
+	set_form_win(form, win_form);
+	set_form_sub(form, derwin(win_form, 18, 76, 1, 1));//18
+	post_form(form);
+	//print_logo(win_body);
+	box(win_body, 0, 0);
+
+	//refresh all
+	refresh();
+	wrefresh(win_body);
+	wrefresh(win_form);
+
+	//input id and password
+	int ch;
+	int flag=0;
+	while (((ch = getch())))
+	{
+		int i;
+		switch (ch) {
+			case 10://enter
+				{
+					form_driver(form, REQ_NEXT_FIELD);
+					form_driver(form, REQ_PREV_FIELD);
+					move(LINES-3, 2);
+
+
+					strcpy(sudoku_answer_psj, trim_whitespaces(field_buffer(fields[1], 0)));
+					for(int i=2;i<10;i++)
+					{
+						strcat(sudoku_answer_psj, trim_whitespaces(field_buffer(fields[i], 0)));
+					}
+					refresh();
+					pos_form_cursor(form);
+					int k=1;
+					int j=40;
+					for(int i=0;i<81;i++,j++)
+					{  
+						sudoku_answer_int[i]=sudoku_answer_psj[i]-'0';
+					}
+					flag=1;
+					break;
+				}
+			case 0x09://tab
+				form_driver(form,REQ_NEXT_FIELD);
+				form_driver(form,REQ_END_LINE);
+				break;
+			case KEY_DOWN:
+				form_driver(form, REQ_NEXT_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
+
+			case KEY_UP:
+				form_driver(form, REQ_PREV_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
+
+			case KEY_LEFT:
+				form_driver(form, REQ_PREV_CHAR);
+				break;
+
+			case KEY_RIGHT:
+				form_driver(form, REQ_NEXT_CHAR);
+				break;
+
+				// Delete the char before cursor
+			case KEY_BACKSPACE:
+			case 127:
+				form_driver(form, REQ_DEL_PREV);
+				break;
+
+				// Delete the char under the cursor
+			case KEY_DC:
+				form_driver(form, REQ_DEL_CHAR);
+				break;
+
+			default:
+				form_driver(form, ch);
+				break;
+		}
+		wrefresh(win_form);
+		if(flag)break;
+	}
+	clear();
+	//free all
+	unpost_form(form);
+	free_all(form,fields);
+	delwin(win_form);
+	delwin(win_body);
+	endwin();
+
+}
+static char* trim_whitespaces(char *str)
+{
+	char *end;
+
+	// trim leading space
+	while(isspace(*str))
+		str++;
+
+	if(*str == 0) // all spaces?
+		return str;
+
+	// trim trailing space
+	end = str + strnlen(str, 128) - 1;
+
+	while(end > str && isspace(*end))
+		end--;
+
+	// write new null terminator
+	*(end+1) = '\0';
+
+	return str;
+}
+static void set_field(FIELD *field[])
+{
+
+	set_field_opts(fields[0], O_VISIBLE | O_PUBLIC | O_AUTOSKIP);
+	for(int i=1;i<10;i++)
+	{
+		set_field_opts(fields[i], O_VISIBLE |O_PUBLIC | O_EDIT | O_ACTIVE);
+		set_field_back(fields[i], A_UNDERLINE);
+	}
+}
+static void free_all(FORM *form,FIELD *fields[])
+{
+	free_form(form);
+	for(int i=0;i<11;i++)
+	{
+		free_field(fields[i]);
+	}
 }

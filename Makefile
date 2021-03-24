@@ -1,13 +1,20 @@
-ddokddok : login_test.o member.o select_game_show.o menu.o maze.o sudoku_answer.o sudoku.o score.o back_g.o rank.o select_game.o
-	gcc login_test.o member.o select_game_show.o menu.o maze.o score.o back_g.o rank.o select_game.o sudoku_answer.o sudoku.o -o ddokddok -lncurses -lform -lmenu
+OPT1 = -I/usr/local/opt/ncurses/include
+OPT2 = -L/usr/local/opt/ncurses/lib
+COM = -lncurses -lform -lmenu -lcurses
+ASR = -W -Wall -Wextra
+OPT3 = $(COM) $(ASR)
 
-login_test.o : login_test.c login_test.h
-	gcc -c login_test.c
-menu.o : menu.c
-	gcc -c menu.c
+ddokddok : login.o main.o maze.o sudoku.o save.o rank.o mode.o
+	gcc $(OPT1) $(OPT2) login.o main.o maze.o save.o rank.o mode.o sudoku.o -o ddokddok $(OPT3)
 
-member.o : member.c member.h
-	gcc -c member.c
+main.o : main.c
+	gcc -c main.c
+
+login.o : login.c login.h
+	gcc -c login.c
+
+mode.o : mode.c mode.h
+	gcc -c mode.c
 
 maze.o : maze.c maze.h
 	gcc -c maze.c
@@ -15,22 +22,11 @@ maze.o : maze.c maze.h
 sudoku.o: sudoku.c sudoku.h
 	gcc -c sudoku.c
 
-
-score.o : score.c score.h
-	gcc -c score.c
-
-back_g.o : back_g.c back_g.h
-	gcc -c back_g.c
 rank.o : rank.c rank.h
 	gcc -c rank.c
-select_game.o : select_game.c select_game.h
-	gcc -c select_game.c
 
-sudoku_answer.o : sudoku_answer.c
-	gcc -c sudoku_answer.c
-
-select_game_show.o : select_game_show.c select_game_show.h
-	gcc -c select_game_show.c
+save.o : save.c save.h
+	gcc -c save.c
 
 clean :
 		rm *.o

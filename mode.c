@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <err.h>
-#include "back_g.h"
-#include "member.h"
+#include "save.h"
+#include "login.h"
 #include "maze.h"
 #include "sudoku.h"
-#include "score.h"
+#include "rank.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
 #define SOLO 1
@@ -70,8 +70,9 @@ void soloMode(Info *player1)
 	int flag=0,level=1;
 	enum{SUDOKU=1,MAZE,BACK};
 
-	while(c = wgetch(my_menu_win))
+	while(1)
 	{       
+		c = wgetch(my_menu_win);
 		switch(c) {	
 			case KEY_DOWN:
 				menu_driver(my_menu, REQ_DOWN_ITEM);
@@ -113,7 +114,7 @@ void soloMode(Info *player1)
 					end=time(NULL); 
 
 					times=(double)(end-start)+(double)(wrong*10);
-					inputScore(player1,times,level,input);
+					inputScore(player1->nickname,times,level,input);
 
 					break;
 				}
@@ -147,7 +148,6 @@ void multiMode()
 
 	while (game->round[0] <= game->round[1]) 
 	{
-		printw(">>%d >>> %d\n", game->round[0], game->round[1]);
 		mvprintw(1, 1, "Round %d\n", game->round[0]);
 		mvprintw(5, 180, "SCORE");
 		mvprintw(6, 180, "--------------------");
@@ -206,8 +206,10 @@ void multiMode()
 		}
 	}
 
+	mvprintw(32, 110, "Press Enter to Continue...");
+
+	deleteFile();
 	refresh();
-	mvprintw(25, 110, "Press Enter to Continue...");
 	getchar();
 }
 

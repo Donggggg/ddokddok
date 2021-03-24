@@ -3,31 +3,30 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include "back_g.h"
+#include "save.h"
 #include <ncurses.h>
 
 void setOption(Setting *set){
 	mvprintw(11,34,"INPUT MIRO ROUND : ");
 	scanw(" %d",&set->miro_round);
 	mvprintw(11, 53, "%d", set->miro_round);
-	//	set->miro_round = Miro_round;
-
 	mvprintw(12,34,"INPUT SUDOKU ROUND : ");
 	scanw(" %d",&set->sudoku_round);
 	mvprintw(12, 55, "%d", set->sudoku_round);
-	//	set->sudoku_round = Sudoku_round;
 	return;
 }
 
-
 void deleteFile(){
-	int dResult = remove("back_up.txt");
+	int dResult = remove(".save");
 }
 
 void setGame(Game *game){ // 새로운 게임 만들기
 	mvprintw(10,34, "HOW MANY PLAYER(MAXIMUN 5)  : ");
 	scanw(" %d",&game->people);
 	mvprintw(10, 63, "%d", game->people);
+
+	for(int i = 0; i < game->people; i++)
+		game->score[i] = 0;
 
 	Setting *set = malloc(sizeof(Setting));
 	setOption(set);
@@ -72,7 +71,7 @@ void setGame(Game *game){ // 새로운 게임 만들기
 }
 
 void saveGame(Game *game){ //세이브파일 만들기
-	FILE *fp = fopen("back_up.txt","wb");
+	FILE *fp = fopen(".save","wb");
 	if(fp==NULL)
 		mvprintw(LINES-6,34,"ERROR\n");
 	else{
@@ -82,24 +81,35 @@ void saveGame(Game *game){ //세이브파일 만들기
 
 }
 
-
 int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이 1이면 세이브파일O + 저장
-	FILE *fp1 = fopen("back_up.txt","rb+");
-	int check;
-	if(fp1==NULL){
-		//		mvprintw(LINES-6,34,"세이브파일에 오류가 있습니다. 죄송합니다\n");
+	FILE *fp1 = fopen(".save","rb+");
+	char check;
+	if(fp1==NULL)
 		return 0;
-	}
 	else{
-		mvprintw(2,34,"We have a Savefile. Road it? (1|0)\n");
-		scanw("%d", &check);
-		//	check = Loadok;
-		if(check == 1){
+		mvprintw(2, 34,"We have a Savefile. Do you want to load it? (Y,N)\n");
+		scanw("%c", &check);
+		mvprintw(2, 84,"%c", check);
+
+		if(check == 'Y' || check == 'y'){
 			rewind(fp1);
-			mvprintw(4,34,"Road savefile....\n");
+
+			mvprintw(4,34,"Load savefile.");
+			refresh();
+			usleep(500000);
+			mvprintw(4,34,"Load savefile..");
+			refresh();
+			usleep(500000);
+			mvprintw(4,34,"Load savefile...");
+			refresh();
+			usleep(500000);
+
 			fread(game, sizeof(Game), 1, fp1);
 			fclose(fp1);
-			mvprintw(6,34,"Road Success.\n");
+			mvprintw(6,34,"Load Success!!");
+			refresh();
+			usleep(1000000);
+			clear();
 			return 1;
 		}
 		else
@@ -107,19 +117,3 @@ int roadGame(Game *game){ //리턴값이 0이면 세이브파일X | 리턴값이
 	}
 
 }	
-
-
-
-
-
-/*
-   int main(){ //새 게임을 시작하거나 기존 게임을 불러오는 경우 세이브파일 삭제
-
-   srand(time(NULL));
-
-   Game game = {0, };
-   Setting set = {3, 2, 1, 10}; //미로 3라운드 스도쿠 2라운드 기본 레벨 1 감점 10
-   setGame(&game, &set);
-
-   }
- */

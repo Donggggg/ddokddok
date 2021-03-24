@@ -33,3 +33,5 @@ int correctSudoku(_Player*);	//스도쿠 정답 검증
 
 int startSudoku(int,int,Game*);		//입력-모드,레벨
 int playSudoku(int,int,Game*);	//입력-모드,레벨, 전체적인 기능 불러오기
+
+void sudoku_answer();

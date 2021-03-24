@@ -1,4 +1,3 @@
-
 typedef struct Info{
 	char id[30]; //ID
 	char password[30]; //비밀번호
@@ -13,6 +12,7 @@ typedef struct Info{
 
 } Info;
 
+void login_UI(Info *player);
 void inputInfo();
 int login(char ID[255], char PW[255]);
 Info login2(int log_num);

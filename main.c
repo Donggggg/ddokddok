@@ -1,28 +1,40 @@
 #include <menu.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <time.h>
 #include <err.h>
+#include "save.h"
+#include "sudoku.h"
+#include "maze.h"
+#include "rank.h"
+#include "login.h"
+#include "mode.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
-#include "back_g.h"
-#include "member.h"
-#include "maze.h"
-#include "sudoku.h"
-#include "score.h"
-#include "rank.h"
+
 //menu select
 static char *choices[] = {
-	"1. SUDOKU",
-	"2. MAZE",
+	"1. Play Solo",
+	"2. Play Multi",
+	"3. Show Rank",
+	"4. Options",
+	"5. Logout",
+	"6. Exit",
 	(char *)NULL,
 };
 
 //print ddok ddok logo
 static void print_logo(WINDOW *my_menu_win);
-void select_game_show()
-{	
+
+enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
+int main()
+{
+	Info *player = malloc(sizeof(Info)); 
+	//login page
+	login_UI(player);
+
 	//menu seletions in MENU
 	ITEM **my_items;
 	int c;			
@@ -73,9 +85,8 @@ void select_game_show()
 	//post menu in window
 	post_menu(my_menu);
 	wrefresh(my_menu_win);
-	int flag=0,level=1;
-	enum{SUDOKU=1,MAZE};
-	while(c = wgetch(my_menu_win))
+	int flag=0;
+	while((c = wgetch(my_menu_win)))
 	{       switch(c)
 		{	case KEY_DOWN:
 			menu_driver(my_menu, REQ_DOWN_ITEM);
@@ -84,18 +95,36 @@ void select_game_show()
 			menu_driver(my_menu, REQ_UP_ITEM);
 			break;
 			case 10: //enter
-			{ 
-				char selection=item_name(current_item(my_menu))[0];
-				flag=1;
-				clear();
-				if(atoi(&selection)==1)
-					show_rank(1);
-				else
-					show_rank(2);
+			{char selection=item_name(current_item(my_menu))[0];
+				//enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
+				switch(atoi(&selection))
+				{
+					case SOLO:
+						clear();
+						soloMode(player);
+						clear();
+						break;
+					case MULTI:
+						clear();
+						multiMode();
+						clear();
+						break;
+					case RANK:
+						select_game_show();
+						clear();
+						break;
+					case LOGOUT:
+						login_UI(player);
+						break;
+					case EXIT:
+						flag=1;
+						clear();
+						break;
+				}
 				break;
 			}
-		}
 
+		}
 
 		if(flag) break;
 		box(my_menu_win, 0, 0);
@@ -104,14 +133,13 @@ void select_game_show()
 		wrefresh(my_menu_win);
 
 	}
+
 	//free all
 	unpost_menu(my_menu);
 	free_menu(my_menu);
 	for(i = 0; i < n_choices; ++i)
 		free_item(my_items[i]);
 	endwin();
-	clear();
-
 }
 static void print_logo(WINDOW *my_menu_win)
 {
@@ -123,10 +151,3 @@ static void print_logo(WINDOW *my_menu_win)
 	while(fgets(line,sizeof(line),fp)!=NULL)
 		mvwprintw(my_menu_win, i++, 4, "%s", line);
 }
-
-
-
-
-
-
-

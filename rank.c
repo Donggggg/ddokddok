@@ -1,13 +1,26 @@
-#include <curses.h>
 #include <menu.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <time.h>
+#include <termios.h>
+#include <err.h>
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
-#include "member.h"
-#include "score.h"
+#include "save.h"
+#include "login.h"
+#include "maze.h"
+#include "sudoku.h"
+#include "rank.h"
 
+//menu select
 static char *choices[] = {
+	"1. SUDOKU",
+	"2. MAZE",
+	(char *)NULL,
+};
+
+static char *ranking[] = {
 	"Choice 1", "Choice 2", "Choice 3", "Choice 4", "Choice 5",
 	"Choice 6", "Choice 7", "Choice 8", "Choice 9", "Choice 10",
 	"Choice 11", "Choice 12", "Choice 13", "Choice 14", "Choice 15",
@@ -28,6 +41,103 @@ static char *choices[] = {
 	(char *)NULL,
 };
 
+//print ddok ddok logo
+static void print_logo(WINDOW *my_menu_win);
+void select_game_show()
+{	
+	//menu seletions in MENU
+	ITEM **my_items;
+	int c;			
+	//MENU WINDOW
+	MENU *my_menu;
+	//MAIN WINDOW
+	WINDOW *my_menu_win;
+	int n_choices, i;
+
+	//Init curses
+	initscr();
+	start_color();
+	cbreak();
+	noecho();
+	keypad(stdscr, TRUE);
+
+	//create menu seletions
+	n_choices = ARRAY_SIZE(choices);
+	my_items = (ITEM **)malloc(n_choices* sizeof(ITEM *));
+
+	for(i = 0; i < n_choices; ++i)
+		my_items[i] = new_item(choices[i],"");
+
+	//create menu window
+	my_menu = new_menu((ITEM **)my_items);
+
+	//create main menu window
+	my_menu_win = newwin(30, 70, 4, 4);
+	keypad(my_menu_win, TRUE);
+
+	/* Set main window and sub window */
+	//?? should to googling
+	set_menu_win(my_menu, my_menu_win);
+	set_menu_sub(my_menu, derwin(my_menu_win, 6, 17, 3, 1));
+
+	//point user selection
+	set_menu_mark(my_menu, "--> ");
+
+	//print title and ddok ddok
+	box(my_menu_win, 0, 0);
+	mvwprintw(my_menu_win, 1, 30, "%s", "Game Menu");
+	mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
+	mvprintw(LINES - 2, 34, "ddok ddok");
+	print_logo(my_menu_win);
+	box(my_menu_win, 0, 0);
+	refresh();
+
+	//post menu in window
+	post_menu(my_menu);
+	wrefresh(my_menu_win);
+	int flag=0,level=1;
+	enum{SUDOKU=1,MAZE};
+	while(1)
+	{       
+		c = wgetch(my_menu_win);
+		switch(c)
+		{	case KEY_DOWN:
+			menu_driver(my_menu, REQ_DOWN_ITEM);
+			break;
+			case KEY_UP:
+			menu_driver(my_menu, REQ_UP_ITEM);
+			break;
+			case 10: //enter
+			{ 
+				char selection=item_name(current_item(my_menu))[0];
+				flag=1;
+				clear();
+				if(atoi(&selection)==1)
+					show_rank(1);
+				else
+					show_rank(2);
+				break;
+			}
+		}
+
+
+		if(flag) break;
+		box(my_menu_win, 0, 0);
+		refresh(); 
+		post_menu(my_menu);
+		wrefresh(my_menu_win);
+
+	}
+	//free all
+	unpost_menu(my_menu);
+	free_menu(my_menu);
+	for(i = 0; i < n_choices; ++i)
+		free_item(my_items[i]);
+	endwin();
+	clear();
+
+}
+
 
 void printScore(int ChooseLank){
 	Score output[500]={0,}, temp={0, }; //1000명의 사람을 수용
@@ -36,7 +146,7 @@ void printScore(int ChooseLank){
 	int miro = 0;
 	int sudo = 0;
 	int N = 0,  go; //갖고오는 사람 수
-	FILE *fp = fopen("score.txt","rb+");
+	FILE *fp = fopen(".score","rb+");
 	if(fp==NULL){
 		printf("파일 오류입니다.\n");
 		return;
@@ -91,29 +201,29 @@ void printScore(int ChooseLank){
 	if(go == 2){ //상위 30명만
 		for(int i = 0; i < 30; i++){ //30명의
 			if(strcmp(miro_out[i].name, "") == 0){
-				choices[choice_go] = (char *)NULL;
+				ranking[choice_go] = (char *)NULL;
 				break;
 			}
 			for(int j = 0; j < 3; j++){ //rank, name, score
 				if(choice_go % 3 == 0){ //rank
 					//		printf("랭크IN\n");
 					sprintf(lank, "%d Rank", i+1);
-					choices[choice_go] = malloc(sizeof(char)*10);
-					strcpy(choices[choice_go], lank);
+					ranking[choice_go] = malloc(sizeof(char)*10);
+					strcpy(ranking[choice_go], lank);
 					//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 1){ //name
 					//		printf("이름IN\n");
-					choices[choice_go] = malloc(sizeof(char)*30);
-					strcpy(choices[choice_go], miro_out[i].name);
+					ranking[choice_go] = malloc(sizeof(char)*30);
+					strcpy(ranking[choice_go], miro_out[i].name);
 					//		printf("%s||%s\n", lank, choices[choice_go]);
 					//		printf("%s||%s\n", miro_out[i].name, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 2){ //score
 					//		printf("점수IN\n");
 					sprintf(strscore, "%d", miro_out[i].score);
-					choices[choice_go] = malloc(sizeof(char)*10);
-					strcpy(choices[choice_go], strscore);
+					ranking[choice_go] = malloc(sizeof(char)*10);
+					strcpy(ranking[choice_go], strscore);
 					//		printf("%s||%s\n", lank, choices[choice_go]);
 					//		printf("%s||%s\n", strscore, choices[choice_go]);
 				}
@@ -126,25 +236,25 @@ void printScore(int ChooseLank){
 	else if(go == 1){ //상위 30명만
 		for(int i = 0; i < 30; i ++){ //30명의
 			if(strcmp(sudo_out[i].name, "") == 0){
-				choices[choice_go] = (char *)NULL;
+				ranking[choice_go] = (char *)NULL;
 				break;
 			}
 			for(int j = 0; j < 3; j ++){ //rank, name, score
 				if(choice_go % 3 == 0){ //rank
 					sprintf(lank, "%d Rank", i+1);
-					choices[choice_go] = malloc(sizeof(char)*10);
-					strcpy(choices[choice_go], lank);
+					ranking[choice_go] = malloc(sizeof(char)*10);
+					strcpy(ranking[choice_go], lank);
 					//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 1){ //name
-					choices[choice_go] = malloc(sizeof(char)*30);
+					ranking[choice_go] = malloc(sizeof(char)*30);
 					strcpy(choices[choice_go], sudo_out[i].name);
 					//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				else if(choice_go % 3 == 2){ //score
 					sprintf(strscore, "%d", sudo_out[i].score);
-					choices[choice_go] = malloc(sizeof(char)*10);
-					strcpy(choices[choice_go], strscore);
+					ranking[choice_go] = malloc(sizeof(char)*10);
+					strcpy(ranking[choice_go], strscore);
 					//		printf("%s||%s\n", lank, choices[choice_go]);
 				}
 				choice_go += 1;
@@ -183,10 +293,10 @@ void show_rank(int game_selection)
 	keypad(stdscr, TRUE);
 	init_pair(1, COLOR_RED,COLOR_YELLOW);
 	//create rank list
-	n_choices = ARRAY_SIZE(choices);
+	n_choices = ARRAY_SIZE(ranking);
 	my_items = (ITEM **)malloc(n_choices* sizeof(ITEM *));
 	for(i = 0; i < n_choices; ++i)
-		my_items[i] = new_item(choices[i], choices[i]);
+		my_items[i] = new_item(ranking[i], ranking[i]);
 
 	//create menu window
 	my_menu = new_menu((ITEM **)my_items);
@@ -221,19 +331,20 @@ void show_rank(int game_selection)
 	wrefresh(win);
 
 	while((c = wgetch(win)) != KEY_F(2))
-	{       switch(c)
-		{	case KEY_DOWN:
-			menu_driver(my_menu, REQ_DOWN_ITEM);
-			break;
+	{       
+		switch(c) {	
+			case KEY_DOWN:
+				menu_driver(my_menu, REQ_DOWN_ITEM);
+				break;
 			case KEY_UP:
-			menu_driver(my_menu, REQ_UP_ITEM);
-			break;
+				menu_driver(my_menu, REQ_UP_ITEM);
+				break;
 			case KEY_LEFT:
-			menu_driver(my_menu, REQ_SCR_UPAGE);
-			break;
+				menu_driver(my_menu, REQ_SCR_UPAGE);
+				break;
 			case KEY_RIGHT:
-			menu_driver(my_menu, REQ_SCR_DPAGE);
-			break;
+				menu_driver(my_menu, REQ_SCR_DPAGE);
+				break;
 		}
 		wrefresh(win);
 	}	
@@ -244,4 +355,34 @@ void show_rank(int game_selection)
 	for(i = 0; i < n_choices; ++i)
 		free_item(my_items[i]);
 	endwin();
+}
+
+void inputScore(char *nickname, double score, int level, int miro_su){
+	Score input = {"",0};
+	FILE *fp = fopen(".score","ab+");
+	if(fp==NULL){
+		printf("파일 오류입니다.\n");
+		fclose(fp);
+		return;
+	}
+	strcpy(input.name, nickname); //이름
+	input.score = score; //점수(걸린 시간)
+	input.level = level; //난이도
+	input.miro_su = miro_su; //미로 스도쿠 (1 2)
+
+
+	fseek(fp,0,SEEK_END); //맨 끝으로 이동
+	fwrite(&input,sizeof(Score),1,fp); //이진 파일로 저장
+	fclose(fp);
+	printf("\n입력이 완료되었습니다.\n\n");
+}
+static void print_logo(WINDOW *my_menu_win)
+{
+	char line[255];
+	FILE *fp;
+	fp=fopen("test.txt","r");
+	if(fp==NULL)    err(EXIT_FAILURE,"NO test.txt file");
+	int i=12;
+	while(fgets(line,sizeof(line),fp)!=NULL)
+		mvwprintw(my_menu_win, i++, 4, "%s", line);
 }
