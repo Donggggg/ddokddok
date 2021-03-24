@@ -1,13 +1,100 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
+#include <string.h>
+#include <ctype.h>
+#include <err.h>
+#include <menu.h>
+#include <form.h>
+#include "save.h"
 #include "sudoku.h"
 
+#define SOLO 1
+#define MULTI 2
+
+int ran, blank = 0;
+int sudoku_answer_int[81];
 _Sudoku sudoku;
 _Player* player;
- 
-int ran;
-int blank = 0;
+
+static char sudoku_answer_psj[82];
+int sudoku_answer_int[81];
+
+static int check_in;
+static FORM *form;
+static FIELD *fields[11];
+static WINDOW *win_body, *win_form;
+static WINDOW *my_menu_win;
+
+//static int flag;
+static char* trim_whitespaces(char *str);
+static void set_field(FIELD *field[]);
+static void free_all(FORM *form,FIELD *fields[]);
+
+static void create_Win()
+{
+	initscr();
+	start_color();
+	cbreak();
+	noecho();
+
+	//create main menu window
+	my_menu_win = newwin(30, 64, 4, 4); 
+	init_pair(1,COLOR_YELLOW,COLOR_GREEN);
+
+	//print title and ddok ddok
+	mvwprintw(my_menu_win, 1, 30, "%s", "Sudoku 9 by 9");
+	mvwhline(my_menu_win, 2, 1, ACS_HLINE, 68);
+	//cero line
+
+	for(int k=3;k<20;k++)
+	{
+		mvwprintw(my_menu_win,k,14,".");
+		mvwprintw(my_menu_win,k,7,".");
+		mvwprintw(my_menu_win,k,28,".");
+		mvwprintw(my_menu_win,k,35,".");
+		mvwprintw(my_menu_win,k,49,".");
+		mvwprintw(my_menu_win,k,56,".");
+	}
+	//garo line
+	int j,i;
+	for(i=1,j=4;i<=9;i++,j+=2)
+	{
+		if(i%3==0)
+		{
+			mvwhline(my_menu_win, j,1, ACS_HLINE, 68);
+			continue;
+		}
+
+		for(int k=0;k<69;k++)
+			mvwprintw(my_menu_win,j,k, ".");
+	}
+	//colum line
+	mvwvline(my_menu_win, 3,21, ACS_VLINE,17);
+	mvwvline(my_menu_win, 3,42, ACS_VLINE,17);
+
+
+	box(my_menu_win, 0, 0); 
+	refresh();
+	wrefresh(my_menu_win);
+	int c;    
+	int flag=0;
+	endwin();
+}
+
+int startSudoku(int mode,int level, Game* game){
+	int w;
+	downloadSudoku();
+
+	player = (_Player*)malloc(sizeof(_Player)*1);
+	w = playSudoku(mode,level,game);
+	free(player);
+	player = NULL;
+
+	uploadSudoku();
+	return w;
+}
 
 int vertical(int n, int x, int arr[][9]){
 	for(int i=0; i<9; i++){
@@ -27,7 +114,7 @@ int horizontal(int n, int y, int arr[][9]){
 	return TRUE;
 }
 
-int box(int n, int x, int y, int arr[][9]){
+int box_sudoku(int n, int x, int y, int arr[][9]){
 	for(int i = 0; i<3; i++){
 		for(int j = 0; j<3; j++){
 			if(arr[(y/3)*3+i][(x/3)*3+j] == n){
@@ -38,42 +125,63 @@ int box(int n, int x, int y, int arr[][9]){
 	return TRUE;
 }
 
-int completeSudoku(int tmp){ return tmp == blank; }
-
 int correctSudoku(_Player* pp){
 	int k, tmp = 0;
 	for(int i=0; i<9;i++)
 		for(int j = 0; j<9;j++){
 			if(!sudoku.problem[i][j]){
-			//빈 칸인 경우
+				//빈 칸인 경우
 				k = pp->input[i][j];
-				if(!vertical(k,j,pp->sol) || !horizontal(k,i,pp->sol) || !box(k,j,i,pp->sol))
+				if(!vertical(k,j,pp->sol) || !horizontal(k,i,pp->sol) || !box_sudoku(k,j,i,pp->sol)){
 					return FALSE; //수가 스도쿠 규칙에 위반할 경우 FALSE 리턴
+				}
 				else {
 					pp->sol[i][j] = k;
 					tmp++;
 				}
 			}
-			else if(sudoku.problem[i][j] && sudoku.problem[i][j] != pp->sol[i][j]) 
-				return -1;
+			else {
+				if(sudoku.problem[i][j] != pp->input[i][j]) {
+					return FALSE;
+				}
+			}
 			//이미 주어진 숫자를 잘못 입력한 경우 오류 메시지 출력 및 -1리턴
 		}
 	return tmp; //모든 빈칸을 잘 채운 경우 TRUE 리턴
 }
 
 void printSudoku(int sudo_p[][9]){
-    for(int i = 0; i<9; i++){
-        if(i%3==0)  printf("-------------------------\n");
-        for(int j = 0; j<9; j++){
-            if(j%3==0)  printf("| ");
-            if(sudo_p[i][j] == 0)
-				printf("  ");
+	create_Win();
+	int tmp[82];
+	int idx=0;
+	for(int i = 0; i<9; i++){
+		for(int j = 0; j<9; j++){
+			if(sudo_p[i][j] == 0)
+			{
+				tmp[idx++]=0; //##############
+			}
 			else 
-				printf("%d ", sudo_p[i][j]);
-       }
-        printf("|\n");
-    }
-    printf("-------------------------\n");
+			{
+				tmp[idx++]=sudo_p[i][j];//########
+			}
+		}
+	//	printf("\n");
+	}
+
+	int k=3;
+	int j=0;
+	for(int i=0;i<9;i++,k+=2)
+	{
+		for(int a=3;a<60;a+=7,j++)
+		{
+			if(tmp[j]!=0)
+				mvwprintw(my_menu_win,k,a,"%d",tmp[j]);
+		}
+
+	}
+	refresh();
+	wrefresh(my_menu_win);
+
 }
 
 //지정된 두 가로 줄 교환// a,b:서로 다른 3*9집합의 가로 줄 번호(a<b)
@@ -138,41 +246,41 @@ void tradeAll(){
 void rotation(){
 	int tmp;
 	switch(ran%3){
-	case 0:
-		//90도 회전
-		for(int a = 0; a<5; a++)
-			for(int b = 0; b<4; b++){
-				tmp = sudoku.origin[a][b];
-				sudoku.origin[a][b] = sudoku.origin[b][8-a];
-				sudoku.origin[b][8-a] = sudoku.origin[8-a][8-b];
-				sudoku.origin[8-a][8-b] = sudoku.origin[8-b][a];
-				sudoku.origin[8-b][a] = tmp;
-			}
-		break;
-	case 1:
-		//180도 회전
-		for(int a = 0; a<5; a++)
-			for(int b = 0; b<4; b++){
-				tmp = sudoku.origin[a][b];
-				sudoku.origin[a][b] = sudoku.origin[8-a][8-b];
-				sudoku.origin[8-a][8-b] = tmp;
-				tmp = sudoku.origin[8-b][a];
-				sudoku.origin[8-b][a] = sudoku.origin[b][8-a];
-				sudoku.origin[b][8-a] = tmp;
-			}
-		break;
-	case 2:
-		//270도 회전
-		for(int a = 0; a<5; a++)
-			for(int b = 0; b<4; b++){
-				tmp = sudoku.origin[a][b];
-				sudoku.origin[a][b] = sudoku.origin[8-b][a];
-				sudoku.origin[8-b][a] = sudoku.origin[8-a][8-b];
-				sudoku.origin[8-a][8-b] = sudoku.origin[b][8-a];
-				sudoku.origin[b][8-a] = tmp;
-			}
-		break;
-	default:break;
+		case 0:
+			//90도 회전
+			for(int a = 0; a<5; a++)
+				for(int b = 0; b<4; b++){
+					tmp = sudoku.origin[a][b];
+					sudoku.origin[a][b] = sudoku.origin[b][8-a];
+					sudoku.origin[b][8-a] = sudoku.origin[8-a][8-b];
+					sudoku.origin[8-a][8-b] = sudoku.origin[8-b][a];
+					sudoku.origin[8-b][a] = tmp;
+				}
+			break;
+		case 1:
+			//180도 회전
+			for(int a = 0; a<5; a++)
+				for(int b = 0; b<4; b++){
+					tmp = sudoku.origin[a][b];
+					sudoku.origin[a][b] = sudoku.origin[8-a][8-b];
+					sudoku.origin[8-a][8-b] = tmp;
+					tmp = sudoku.origin[8-b][a];
+					sudoku.origin[8-b][a] = sudoku.origin[b][8-a];
+					sudoku.origin[b][8-a] = tmp;
+				}
+			break;
+		case 2:
+			//270도 회전
+			for(int a = 0; a<5; a++)
+				for(int b = 0; b<4; b++){
+					tmp = sudoku.origin[a][b];
+					sudoku.origin[a][b] = sudoku.origin[8-b][a];
+					sudoku.origin[8-b][a] = sudoku.origin[8-a][8-b];
+					sudoku.origin[8-a][8-b] = sudoku.origin[b][8-a];
+					sudoku.origin[b][8-a] = tmp;
+				}
+			break;
+		default:break;
 	}
 }
 
@@ -231,7 +339,7 @@ void tradeNumber(){
 }
 
 //void removeNum(int level, int weight){
-	
+
 
 //파일 입출력을 통해 좋은 예시의 스도쿠 원형을 받음
 void downloadSudoku(){
@@ -240,7 +348,7 @@ void downloadSudoku(){
 	for(int i = 0; i<9; i++)
 		for(int j = 0; j<9; j++){
 			int tmp = fscanf(fp, "%d ", &sudoku.origin[i][j]);
-			if(sudoku.origin[i][j] == 0 || tmp == EOF) printf("error:스도쿠가 제대로 입력되지 않았음\n");
+			if(sudoku.origin[i][j] == 0 || tmp == EOF) {mvprintw(LINES-2,70,"error:스도쿠가 제대로 입력되지 않았음");}
 		}
 	fclose(fp);
 }
@@ -251,25 +359,10 @@ void uploadSudoku(){
 	if(fp==NULL) exit(-1);
 	for(int i = 0; i<9; i++)
 		for(int j = 0; j<9; j++){
-			if(sudoku.origin[i][j] == 0) printf("error:스도쿠가 제대로 저장되지 않았음\n");
+			if(sudoku.origin[i][j] == 0) mvprintw(LINES-2,70,"error:스도쿠가 제대로 저장되지 않았음");
 			fprintf(fp, "%d ", sudoku.origin[i][j]);
 		}
 	fclose(fp);
-}
-
-//스도쿠 오류 발생 시 수정
-void editSudoku(){
-	int er = 0;
-	printf("수정할 스도쿠 입력:\n");
-	for(int i=0; i<9; i++)
-		for(int j=0; j<9; j++){
-			scanf("%d", &sudoku.origin[i][j]);
-			if(sudoku.origin[i][j] < 1 || sudoku.origin[i][j] > 9){
-				printf("error: 1부터 9까지의 자연수를 입력하시오.\n");
-				er = 1;
-			}
-		}
-	if(er) editSudoku();
 }
 
 void makeSudokuOrigin(){
@@ -307,9 +400,9 @@ void makeSudokuOrigin(){
 }
 
 void makeSudokuProblem(int level){
-	//레벨 당 구멍 개수: 25 + level*5
-	//조절 가능
-	int count = (25 + level*5), hole;
+	//37 - 55까지
+	//레벨 당 구멍 개수: 35 + level*2
+	int count = (35 + level*2), hole; 
 	blank = count;
 	srand(time(NULL));
 	while(count){
@@ -321,55 +414,267 @@ void makeSudokuProblem(int level){
 	}
 }
 
-//////////////////////////////////////
-//       입력 시 ui 수정 필요       //
-//////////////////////////////////////
+//저장된 스도쿠 불러오기
 void IN_sudoku(_Player* pop){
-	char ch;
-	getchar();
-    for(int i = 0; i<9; i++){
-        for(int j = 0; j<9;j++){
-            scanf("%d", &pop->input[i][j]);
+	int k=0;
+	for(int i = 0; i<9; i++)
+	{
+		for(int j = 0; j<9;j++)
+		{
+			//pop->input[i][j]=sudoku_answer_int[k++];
+			pop->input[i][j]=sudoku.origin[i][j];
 			pop->sol[i][j] = sudoku.problem[i][j];
-		}
-    }
-}
-
-void playSudoku(int player_num, int level){
-	int input_num = 0; 	//답 입력 개수
-	int cor = FALSE; 	//정답 여부
-//라운드 별 반복 구간
-	//문제 생성
-	makeSudokuOrigin();
-	makeSudokuProblem(level);
-	printSudoku(sudoku.problem);
-	printSudoku(sudoku.origin);
-
-	while(!cor){
-		IN_sudoku(player); //[player_num]); //해당 플레이어의 구조체 주소 전송
-		input_num = correctSudoku(player); //[player_num]);
-		if(input_num == FALSE){		//답이 틀린 경우
-			printf("0:오답\n");
-		}
-		else if(input_num == -1){	//기존의 주어진 문제를 잘못 입력한 경우
-			printf("-1:오답\n");
-		}
-		//위 두 케이스를 구분할지 말지 정하지 않음
-		else{
-			cor = completeSudoku(input_num);
-			if(cor) {
-				printf("정답\n");
-				printSudoku(player->sol);
-			}
 		}
 	}
 }
 
-void startSudoku(){
-	int level = 1;
-	player = (_Player*)malloc(sizeof(_Player)*1);
-	downloadSudoku();
-	//editSudoku();
-	playSudoku(1,level);
-	uploadSudoku();
+int playSudoku(int mode,int level,Game* game){
+	int input_num = 0, wrong = 0; 	//답 입력 개수
+	int cor = FALSE; 	//정답 여부
+	//라운드 별 반복 구간
+	//문제 생성
+	makeSudokuOrigin();
+	makeSudokuProblem(level);
+
+	printSudoku(sudoku.origin); // 문제 출력
+	int playerNum, isGameover;
+	while(!cor){
+		if(mode == MULTI){
+			saveGame(game); // 현재 상태 세이브
+			mvprintw(LINES-2,34,"Input Player Number : ");
+			scanw("%d", &playerNum);
+			mvprintw(LINES-2, 73,"%d", playerNum);
+
+			if(playerNum>game->people||playerNum<0) {
+				mvprintw(LINES-2,34,"Wrong INPUT.");
+				continue;
+			}
+
+			if(game->plus_score[playerNum-1] <= 0){
+				//printf("NO chance");
+				continue;
+			}
+		}
+
+		sudoku_answer(); // 정답 입력 UI 출력
+		IN_sudoku(player); // 정답 검증 준비
+
+		/*
+		 //스도쿠 검증 디버깅 코드
+		   for(int a=0;a<9;a++){
+		   for(int b=0;b<9;b++){
+		   printf("%d ", player->input[a][b]);
+		   }
+		   printf("\n");
+		   }
+		   printf("---------------------------\n");
+		   for(int a=0;a<9;a++){
+		   for(int b=0;b<9;b++){
+		   printf("%d ", player->sol[a][b]);
+		   }
+		   printf("\n");
+		   }
+		 */
+
+		input_num = correctSudoku(player); // 정답 검증
+	//	mvprintw(LINES-3,34,"input_num: %d",input_num);
+		input_num=1;
+
+		if(input_num == FALSE){	//답이 틀린 경우
+			mvprintw(LINES-2,34,"INCORRECT");
+			//printf("오답\n");
+			if(mode==MULTI)
+				game->plus_score[playerNum-1] -= 50;
+			wrong++;
+		}
+		else if(input_num == -1){	//기존의 주어진 문제를 잘못 입력한 경우
+			mvprintw(LINES-2,34,"INCORRECT");
+			//printf("오답\n");
+			game->plus_score[playerNum-1] -= 50;
+			wrong++;
+		}
+		//위 두 케이스를 구분할지 말지 정하지 않음
+		else{
+			cor=1;//debug##
+			if(cor) {
+				mvprintw(LINES-2,34,"CORRECT");
+				//printSudoku(player->sol);##
+				if(mode==MULTI)
+					game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
+			}
+		}
+
+		if(mode == MULTI){	
+			isGameover = 1;
+			//모든 플레이어가 점수를 잃었을 때 gameover
+			for(int k = 0; k<game->people; k++){
+				if(game -> plus_score[k] > 0) isGameover = 0;
+			}
+			if(isGameover) {
+				printf("무승부\n");
+				break;
+			}
+		}
+	}
+
+	return wrong;
+}
+
+
+void sudoku_answer()
+{
+	//init window tab
+	initscr();
+	start_color();
+	noecho();
+	cbreak();
+	keypad(stdscr, TRUE);
+
+	//create main window and form window
+	win_body = newwin(30,70, 4, 70);
+	win_form = derwin(win_body, 20, 60, 4,4 );//20, 60 ,4 ,4
+	mvwprintw(win_body, 1, 15, "Write your answers");
+	//declare filed location
+	fields[0] = new_field(1, 10, 0, 10, 0, 0);
+	for(int i=1,k=2;i<10;i++,k+=2)
+	{
+		fields[i] = new_field(1, 40, k, 15, 0, 0);
+	}
+	fields[10] = NULL;
+
+	set_field_buffer(fields[0], 0, "Input : ");
+
+	//set field options
+	set_field(fields);
+	form = new_form(fields);
+
+	set_form_win(form, win_form);
+	set_form_sub(form, derwin(win_form, 18, 76, 1, 1));//18
+	post_form(form);
+	//print_logo(win_body);
+	box(win_body, 0, 0);
+
+	//refresh all
+	refresh();
+	wrefresh(win_body);
+	wrefresh(win_form);
+
+	//input id and password
+	int ch;
+	int flag=0;
+	while (((ch = getch())))
+	{
+		int i;
+		switch (ch) {
+			case 10://enter
+				{
+					form_driver(form, REQ_NEXT_FIELD);
+					form_driver(form, REQ_PREV_FIELD);
+					move(LINES-3, 2);
+
+
+					strcpy(sudoku_answer_psj, trim_whitespaces(field_buffer(fields[1], 0)));
+					for(int i=2;i<10;i++)
+					{
+						strcat(sudoku_answer_psj, trim_whitespaces(field_buffer(fields[i], 0)));
+					}
+					refresh();
+					pos_form_cursor(form);
+					int k=1;
+					int j=40;
+					for(int i=0;i<81;i++,j++)
+					{  
+						sudoku_answer_int[i]=sudoku_answer_psj[i]-'0';
+					}
+					flag=1;
+					break;
+				}
+			case 0x09://tab
+				form_driver(form,REQ_NEXT_FIELD);
+				form_driver(form,REQ_END_LINE);
+				break;
+			case KEY_DOWN:
+				form_driver(form, REQ_NEXT_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
+
+			case KEY_UP:
+				form_driver(form, REQ_PREV_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
+
+			case KEY_LEFT:
+				form_driver(form, REQ_PREV_CHAR);
+				break;
+
+			case KEY_RIGHT:
+				form_driver(form, REQ_NEXT_CHAR);
+				break;
+
+				// Delete the char before cursor
+			case KEY_BACKSPACE:
+			case 127:
+				form_driver(form, REQ_DEL_PREV);
+				break;
+
+				// Delete the char under the cursor
+			case KEY_DC:
+				form_driver(form, REQ_DEL_CHAR);
+				break;
+
+			default:
+				form_driver(form, ch);
+				break;
+		}
+		wrefresh(win_form);
+		if(flag)break;
+	}
+	clear();
+	//free all
+	unpost_form(form);
+	free_all(form,fields);
+	delwin(win_form);
+	delwin(win_body);
+	endwin();
+
+}
+static char* trim_whitespaces(char *str)
+{
+	char *end;
+
+	// trim leading space
+	while(isspace(*str))
+		str++;
+
+	if(*str == 0) // all spaces?
+		return str;
+
+	// trim trailing space
+	end = str + strnlen(str, 128) - 1;
+
+	while(end > str && isspace(*end))
+		end--;
+
+	// write new null terminator
+	*(end+1) = '\0';
+
+	return str;
+}
+static void set_field(FIELD *field[])
+{
+
+	set_field_opts(fields[0], O_VISIBLE | O_PUBLIC | O_AUTOSKIP);
+	for(int i=1;i<10;i++)
+	{
+		set_field_opts(fields[i], O_VISIBLE |O_PUBLIC | O_EDIT | O_ACTIVE);
+		set_field_back(fields[i], A_UNDERLINE);
+	}
+}
+static void free_all(FORM *form,FIELD *fields[])
+{
+	free_form(form);
+	for(int i=0;i<11;i++)
+	{
+		free_field(fields[i]);
+	}
 }

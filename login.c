@@ -1,11 +1,205 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <assert.h>
+#include <form.h>
 #include <string.h>
-#include "member.h"
+#include <stdlib.h>
+#include <ctype.h>
+#include <err.h>
+#include "login.h"
+
+int check_in;
+static FORM *form;
+static FIELD *fields[5];
+static WINDOW *win_body, *win_form;
+static char ID[255];
+static char PW[255];
+static int flag;
+static char* trim_whitespaces(char *str);
+static void set_field(FIELD *field[]);
+static void free_all(FORM *form,FIELD *fields[]);
+static void print_logo(WINDOW *my_menu_win);
+
+void login_UI(Info *player)
+{
+	//init window tab
+	initscr();
+	start_color();
+	noecho();
+	cbreak();
+	keypad(stdscr, TRUE);
+
+	//create main window and form window
+	win_body = newwin(30,70, 4, 4);
+	win_form = derwin(win_body, 20, 60, 4,4 );//20, 60 ,4 ,4
+	mvwprintw(win_body, 1, 15, "Welcome to ddok ddok games");
+	//declare filed location
+	fields[0] = new_field(1, 10, 0, 10, 0, 0);
+	fields[1] = new_field(1, 40, 0, 15, 0, 0);
+	fields[2] = new_field(1, 10, 2, 10, 0, 0);
+	fields[3] = new_field(1, 40, 2, 15, 0, 0);
+	fields[4] = NULL;
+
+	set_field_buffer(fields[0], 0, "ID : ");
+	set_field_buffer(fields[2], 0, "PW : ");
+
+	//set field options
+	set_field(fields);
+
+	form = new_form(fields);
+
+	set_form_win(form, win_form);
+	set_form_sub(form, derwin(win_form, 18, 76, 1, 1));//18
+	post_form(form);
+	print_logo(win_body);
+	box(win_body, 0, 0);
+
+	//refresh all
+	refresh();
+	wrefresh(win_body);
+	wrefresh(win_form);
+
+	//input id and password
+	int ch;
+	while (((ch = getch())))
+	{
+		int i;
+
+		switch (ch) {
+			case 10://enter
+				{
+					// Or the current field buffer won't be sync with what is displayed
+					form_driver(form, REQ_NEXT_FIELD);
+					form_driver(form, REQ_PREV_FIELD);
+					move(LINES-3, 5);
+					strcpy(ID, trim_whitespaces(field_buffer(fields[1], 0)));
+				//	mvprintw(30,20,"ID :%s", ID);
+					strcpy(PW, trim_whitespaces(field_buffer(fields[3], 0)));
+				//	mvprintw(30,30," PW: %s",PW);
+					refresh();
+					pos_form_cursor(form);
+					
+					check_in=login(ID,PW);
+
+					//true file offset
+					//false return -1
+					if(check_in != -1){ 
+						*player = login2(check_in);
+						flag=1;
+					}
+					else{
+						mvprintw(31,25,"Incorrect!!");
+					}
+					break;
+				}
+			case 0x09://tab
+				form_driver(form,REQ_NEXT_FIELD);
+				form_driver(form,REQ_END_LINE);
+				break;
+			case KEY_DOWN:
+				form_driver(form, REQ_NEXT_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
+
+			case KEY_UP:
+				form_driver(form, REQ_PREV_FIELD);
+				form_driver(form, REQ_END_LINE);
+				break;
+
+			case KEY_LEFT:
+				form_driver(form, REQ_PREV_CHAR);
+				break;
+
+			case KEY_RIGHT:
+				form_driver(form, REQ_NEXT_CHAR);
+				break;
+
+				// Delete the char before cursor
+			case KEY_BACKSPACE:
+			case 127:
+				form_driver(form, REQ_DEL_PREV);
+				break;
+
+				// Delete the char under the cursor
+			case KEY_DC:
+				form_driver(form, REQ_DEL_CHAR);
+				break;
+
+			default:
+				form_driver(form, ch);
+				break;
+		}
+		wrefresh(win_form);
+		if(flag)break;
+	}
+	clear();
+	//free all
+	unpost_form(form);
+	free_all(form,fields);
+	delwin(win_form);
+	delwin(win_body);
+	endwin();
+
+}
+static char* trim_whitespaces(char *str)
+{
+	char *end;
+
+	// trim leading space
+	while(isspace(*str))
+		str++;
+
+	if(*str == 0) // all spaces?
+		return str;
+
+	// trim trailing space
+	end = str + strnlen(str, 128) - 1;
+
+	while(end > str && isspace(*end))
+		end--;
+
+	// write new null terminator
+	*(end+1) = '\0';
+
+	return str;
+}
+static void set_field(FIELD *field[])
+{
+
+	set_field_opts(fields[0], O_VISIBLE | O_PUBLIC | O_AUTOSKIP);
+	set_field_opts(fields[1], O_VISIBLE |O_PUBLIC | O_EDIT | O_ACTIVE);
+	set_field_opts(fields[2], O_VISIBLE | O_PUBLIC | O_AUTOSKIP);
+	set_field_opts(fields[3], O_VISIBLE | O_EDIT | O_ACTIVE);
+	field_opts_off(fields[3],O_PUBLIC);
+	set_field_back(fields[1], A_UNDERLINE);
+	set_field_back(fields[3], A_UNDERLINE);
+}
+static void free_all(FORM *form,FIELD *fields[])
+{
+	free_form(form);
+	free_field(fields[0]);
+	free_field(fields[1]);
+	free_field(fields[2]);
+	free_field(fields[3]);
+}
+
+
+
+static void print_logo(WINDOW *my_menu_win)
+{
+	char line[255];
+	FILE *fp;
+	fp=fopen("test.txt","r");
+	if(fp==NULL)    err(EXIT_FAILURE,"NO test.txt file");
+	int i=12;
+	while(fgets(line,sizeof(line),fp)!=NULL)
+	{
+		mvwprintw(my_menu_win, i++, 4, "%s", line);
+	}
+}
 
 //회원가입 함수
 void inputInfo(){
-	FILE *fp = fopen("info.txt", "ab+");
+	FILE *fp = fopen(".member", "ab+");
 	Info input, person_list[100];
 	int N = 0, noone_check = 0; //갖고 올 회원 수, 회원이 없을 때 회원번호 판별 변수
 
@@ -54,8 +248,9 @@ void inputInfo(){
 			break;
 	}
 
-	printf("관리자 계정으로 생성하시겠습니까? (1/0) : ");
-	scanf("%d", &input.manage);
+
+	input.manage = 0;
+
 
 	if(noone_check == 0) //아무도 없는 경우 회원번호
 		input.member_number = N + 1;
@@ -70,10 +265,24 @@ void inputInfo(){
 
 }
 
+Info login2(int log_num){
+	FILE *fp = fopen(".member", "ab+");
+	Info person_list[100];
+	int N = 0;
+	rewind(fp);
+	while(fread(&person_list[N], sizeof(Info), 1, fp)){
+		N += 1;
+	}
+	fclose(fp);
+
+	return person_list[log_num];
+
+}
+
 
 //로그인 함수
-Info login(){
-	FILE *fp = fopen("info.txt", "ab+");
+int login(char ID[255], char PW[255]){
+	FILE *fp = fopen(".member", "ab+");
 	Info person_list[100];
 	char check_id[30], check_password[30];
 	int isExist = 0, N = 0, me; //로그인 닉네임 체크, 갖고 올 회원 수, 몇 번째 회원
@@ -83,46 +292,42 @@ Info login(){
 		N += 1;
 	}
 
-	while(1){
-		int isokay = 0;
-		printf("ID : "); //ID 로그인 과정
-		scanf("%s", check_id);
-		for(int i = 0; i < N; i++){
-			if(strcmp(check_id, person_list[i].id) == 0){ //만약 닉네임이 겹치면
-				isExist = 1;
-				me = i; // 해당 번째 인물 위치 저장
-				isokay = 1; //while 탈출!
-				break;
-			}
-		}
-		if(isExist == 0){
-			printf("존재하지 않는 ID입니다. 다시 입력하세요\n\n");
-			continue;
-		}
-		if(isokay==1) //닉네임 완료 
-			break;
-	}
-	while(1){ //패스워드 로그인 과정
-
-		printf("Password : ");
-		scanf("%s", check_password);
-		if(strcmp(check_password, person_list[me].password) == 0){
-			printf("\n로그인이 성공했습니다.\n\n");
-			break;
-		}
-		else{
-			printf("패스워드가 틀립니다. 다시 입력하세요\n\n");
-			continue;
-		}
-	}
-
 	fclose(fp);
-	return person_list[me];
+
+	int isokay = 0;
+	strcpy(check_id, ID);
+
+	for(int i = 0; i < N; i++){
+		if(strcmp(check_id, person_list[i].id) == 0){ //만약 닉네임이 겹치면
+			isExist = 1;
+			me = i; // 해당 번째 인물 위치 저장
+			isokay = 1; //while 탈출!
+			break;
+		}
+	}
+
+	if(strcmp("",check_id) == 0)
+		return -1;
+
+	if(isExist == 0){
+		return -1;
+	}
+
+	strcpy(check_password, PW);
+	if(strcmp(check_password, person_list[me].password) == 0){
+		//printf("\n로그인이 성공했습니다.\n\n");
+		return me;
+	}
+	else{
+		//printf("패스워드가 틀립니다.\n\n");
+		return -1;
+	}
+
 }
 
 //ID랑 PW를 찾는 함수
 void searchIdPass(int check){
-	FILE *fp = fopen("info.txt","ab+");
+	FILE *fp = fopen(".member","ab+");
 	Info person_list[100];
 	int N = 0, idExist = 0, M = 0;
 	char input_info[5][30]; // 0:ID 1:이름 2:닉네임 3:이메일 4:번호
@@ -189,7 +394,7 @@ void searchIdPass(int check){
 
 //관리자 메뉴 함수
 void manageMember(){	
-	FILE *fp = fopen("info.txt","ab+");
+	FILE *fp = fopen(".member","ab+");
 	Info person_list[100];
 	int N = 0, go, input_memnum, delete; //최대 인원, 이동, 입력할 회원번호, 삭제할 회원 순서
 	rewind(fp);
@@ -225,7 +430,7 @@ void manageMember(){
 					person_list[i] = person_list[i+1]; //덮어쓰기
 				N -= 1;
 				fclose(fp);
-				fp = fopen("info.txt", "wb");
+				fp = fopen(".member", "wb");
 				rewind(fp);
 				for(int i = 0; i < N; i++)
 					fwrite(&person_list[i], sizeof(Info), 1, fp);
@@ -235,6 +440,11 @@ void manageMember(){
 
 
 		}
+		else if(go == 3){
+			printf("관리자 모드를 종료합니다.\n");
+			break;
+		}
+
 		else{
 			printf("없는 메뉴입니다.\n");
 			break;
@@ -269,15 +479,26 @@ int printMenu(Info member){
 
 
 void startLogin(Info *player){
-	int go, login_check = 0; //메뉴 이동(일반, 관리자 버전), 로그인 체크
+	int go, login_check = 0, log_num; //메뉴 이동(일반, 관리자 버전), 로그인 체크
 	Info member = {0, }; //로그인한 멤버의 정보를 저장
+	char ID[255], PW[255];
+
 	while(login_check == 0){
 		go = printMenu(member);
 		if(go == 1){ //로그인
-			member = login();
-			login_check = 1;
-			*player = member;
-			break;
+			printf("ID: ");
+			scanf("%s", ID);
+			printf("PW: ");
+			scanf("%s", PW);
+
+			log_num = login(ID, PW);
+			if(log_num != -1){
+				member = login2(log_num);
+				login_check = 1;
+				*player = member;
+				break; // 로그인 시 종료
+			}
+
 		}
 		else if(go == 2){ //회원가입
 			inputInfo();
@@ -304,7 +525,7 @@ void startLogin(Info *player){
 			exit(0);
 
 	}
-		
+
 	if(member.manage == 1 && login_check == 1){ //관리자 모드 로그인 시 (관리자 모드가 종료되면 프로그램 종료)
 		manageMember();
 		exit(0);
