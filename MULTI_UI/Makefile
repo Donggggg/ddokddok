@@ -1,5 +1,5 @@
 ddokddok : login_test.o member.o select_game_show.o menu.o maze.o sudoku_answer.o sudoku.o score.o back_g.o rank.o select_game.o
-	gcc login_test.o member.o select_game_show.o menu.o maze.o score.o back_g.o rank.o select_game.o sudoku_answer.o sudoku.o -o ddokddok -lncurses -lform -lmenu
+	gcc -I/usr/local/opt/ncurses/include -L/usr/local/opt/ncurses/lib login_test.o member.o select_game_show.o menu.o maze.o score.o back_g.o rank.o select_game.o sudoku_answer.o sudoku.o -o ddokddok -lncurses -lform -lmenu -lcurses
 
 login_test.o : login_test.c login_test.h
 	gcc -c login_test.c

@@ -244,7 +244,7 @@ int checkAnswer(int mode, Game *game){
 			}
 
 			if (game->plus_score[player-1] <= 0){
-				printf("기회가 없습니다.\n");
+				//	printf("기회가 없습니다.\n");
 				continue;
 			}
 		}
@@ -324,15 +324,17 @@ int checkAnswer(int mode, Game *game){
 				if(game ->plus_score[k] > 0) isGameover = 0;
 			}
 			if(isGameover){
-				printf("무승부");
+				mvprintw(LINES-2,34,"All players lost the chances");
+				sleep(2);
 				break;
 			}
 		}
 	}
+	clear();
 	mvprintw(LINES-2,34,"Your answer is correct!!!!!!!!!!!!!!!!");
 	if (mode == MULTI)
 		game->score[player-1] += game->plus_score[player-1];
 	refresh();
-	sleep(3);
+	sleep(2);
 	return wrong;
 }

@@ -2,25 +2,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <time.h>
-//#include "main.h"
+#include <err.h>
 #include "back_g.h"
 #include "member.h"
 #include "sudoku.h"
 #include "maze.h"
 #include "score.h"
-#include <err.h>
 #include "rank.h"
 #include "login_test.h"
 #include "select_game.h"
 #include "select_game_show.h"
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 	4
-/*
-   Game *game; //멀티모드 진행 게임 상황
-   Setting *set; //설정 저장
-   Info *player1;
- */
+
 //menu select
 static char *choices[] = {
 	"1. Play Solo",
@@ -34,7 +30,7 @@ static char *choices[] = {
 
 //print ddok ddok logo
 static void print_logo(WINDOW *my_menu_win);
-void multiMode(); //멀티모드
+
 enum{SOLO=1,MULTI,RANK,OPTION,LOGOUT,EXIT};
 int main()
 {
@@ -108,18 +104,20 @@ int main()
 				{
 					case SOLO:
 						clear();
-						select_game(player);
+						soloMode(player);
 						clear();
 						break;
 					case MULTI:
 						clear();
 						multiMode();
-
+						clear();
 						break;
 					case RANK:
-						///			show_rank();
 						select_game_show();
 						clear();
+						break;
+					case LOGOUT:
+						login_UI(player);
 						break;
 					case EXIT:
 						flag=1;
@@ -155,49 +153,4 @@ static void print_logo(WINDOW *my_menu_win)
 	int i=12;
 	while(fgets(line,sizeof(line),fp)!=NULL)
 		mvwprintw(my_menu_win, i++, 4, "%s", line);
-}
-
-void multiMode()
-{
-
-	Game *game = malloc(sizeof(Game));
-	int road_check = roadGame(game);
-	if(road_check == 1){
-		//세이브파일 존재
-	}
-	else{
-		setGame(game);
-	}
-	int i = 0;
-	while (game->round[0] <= game->round[1]){
-		printf("\n%d라운드입니다\n", game->round[0]);
-		for (int j = 0; j < game -> people; j++){
-			game->plus_score[j] = 100 * game->round[0];
-		}
-
-		if (game->game_select[i] == 1){
-			startMaze(MULTI,game->round[0],game);
-			game->round[0] += 1;
-		}
-		else if (game->game_select[i] == 2){
-			startSudoku(MULTI, game->round[0],game);
-			game->round[0] += 1;
-		}
-		else{
-			printf("오류입니다");
-			break;
-		}
-	}
-/*	
-	printf("\n==========결과==========\n");
-	int temp, temp2, check_people[5] = {1, 2, 3, 4, 5};
-	for(int i = 0; i < game->people-2; i++){
-		for(int j = 0; j < game->people-2-i; j++){
-			if(game->score[j] < game->score[j+1]){
-				temp = game->score[i];
-				temp2 = check_people[i];
-			}
-		}
-	}
-*/	
 }

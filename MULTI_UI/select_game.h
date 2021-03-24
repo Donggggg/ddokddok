@@ -1,1 +1,2 @@
-void select_game(Info *player1);
+void soloMode(Info *player1);
+void multiMode();

@@ -454,7 +454,7 @@ int playSudoku(int mode,int level,Game* game){
 		sudoku_answer(); // 정답 입력 UI 출력
 		IN_sudoku(player); // 정답 검증 준비
 
-		/* 스도쿠 검증 디버깅 코드
+		 //스도쿠 검증 디버깅 코드
 		   for(int a=0;a<9;a++){
 		   for(int b=0;b<9;b++){
 		   printf("%d ", player->input[a][b]);
@@ -468,7 +468,7 @@ int playSudoku(int mode,int level,Game* game){
 		   }
 		   printf("\n");
 		   }
-		 */
+		 
 
 		input_num = correctSudoku(player); // 정답 검증
 		mvprintw(LINES-3,34,"input_num: %d",input_num);
