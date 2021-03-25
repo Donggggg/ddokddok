@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <time.h>
 #include <assert.h>
 #include <string.h>
@@ -165,7 +166,7 @@ void printSudoku(int sudo_p[][9]){
 				tmp[idx++]=sudo_p[i][j];//########
 			}
 		}
-	//	printf("\n");
+		//	printf("\n");
 	}
 
 	int k=3;
@@ -187,7 +188,7 @@ void printSudoku(int sudo_p[][9]){
 //지정된 두 가로 줄 교환// a,b:서로 다른 3*9집합의 가로 줄 번호(a<b)
 void tradeRow(int a, int b){
 	int tmp;
-	for(int j = a*3; j<a+3;j++)
+	for(int j = a*3; j<a*3+3;j++)
 		for(int i = 0; i<9; i++){
 			tmp = sudoku.origin[j][i];
 			sudoku.origin[j][i] = sudoku.origin[j+3*(b-a)][i];
@@ -197,7 +198,7 @@ void tradeRow(int a, int b){
 //지정된 두 세로 줄 교환// a,b:서로 다른 3*9집합의 세로 줄 번호(a<b)
 void tradeColumn(int a, int b){
 	int tmp;
-	for(int j = a*3; j<a+3; j++)
+	for(int j = a*3; j<a*3+3; j++)
 		for(int i = 0; i<9; i++){
 			tmp = sudoku.origin[i][j];
 			sudoku.origin[i][j] = sudoku.origin[i][j+3*(b-a)];
@@ -343,7 +344,7 @@ void tradeNumber(){
 
 //파일 입출력을 통해 좋은 예시의 스도쿠 원형을 받음
 void downloadSudoku(){
-	FILE *fp = fopen("sudoku.txt","rt");
+	FILE *fp = fopen(".sudoku","rt");
 	if(fp==NULL) exit(-1);
 	for(int i = 0; i<9; i++)
 		for(int j = 0; j<9; j++){
@@ -355,7 +356,7 @@ void downloadSudoku(){
 
 //파일에 다음에 쓸 스도쿠 저장
 void uploadSudoku(){
-	FILE *fp = fopen("sudoku.txt","wt");
+	FILE *fp = fopen(".sudoku","wt");
 	if(fp==NULL) exit(-1);
 	for(int i = 0; i<9; i++)
 		for(int j = 0; j<9; j++){
@@ -421,8 +422,8 @@ void IN_sudoku(_Player* pop){
 	{
 		for(int j = 0; j<9;j++)
 		{
-			//pop->input[i][j]=sudoku_answer_int[k++];
-			pop->input[i][j]=sudoku.origin[i][j];
+			pop->input[i][j]=sudoku_answer_int[k++];
+			//pop->input[i][j]=sudoku.origin[i][j];
 			pop->sol[i][j] = sudoku.problem[i][j];
 		}
 	}
@@ -431,16 +432,20 @@ void IN_sudoku(_Player* pop){
 int playSudoku(int mode,int level,Game* game){
 	int input_num = 0, wrong = 0; 	//답 입력 개수
 	int cor = FALSE; 	//정답 여부
-	//라운드 별 반복 구간
+	int playerNum, isGameover;
+
 	//문제 생성
 	makeSudokuOrigin();
 	makeSudokuProblem(level);
 
-	printSudoku(sudoku.origin); // 문제 출력
-	int playerNum, isGameover;
-	while(!cor){
-		if(mode == MULTI){
+	while(!cor)
+	{
+		printSudoku(sudoku.problem); // 문제 출력
+		//printSudoku(sudoku.origin); // 정답 스도쿠 디버깅용
+
+		if(mode == MULTI) {
 			saveGame(game); // 현재 상태 세이브
+
 			mvprintw(LINES-2,34,"Input Player Number : ");
 			scanw("%d", &playerNum);
 			mvprintw(LINES-2, 73,"%d", playerNum);
@@ -450,8 +455,8 @@ int playSudoku(int mode,int level,Game* game){
 				continue;
 			}
 
-			if(game->plus_score[playerNum-1] <= 0){
-				//printf("NO chance");
+			if(game->plus_score[playerNum-1] <= 0) {
+				mvprintw(LINES-3,34,"Player %d can't answer anymore", playerNum);
 				continue;
 			}
 		}
@@ -459,59 +464,61 @@ int playSudoku(int mode,int level,Game* game){
 		sudoku_answer(); // 정답 입력 UI 출력
 		IN_sudoku(player); // 정답 검증 준비
 
-		/*
-		 //스도쿠 검증 디버깅 코드
-		   for(int a=0;a<9;a++){
-		   for(int b=0;b<9;b++){
-		   printf("%d ", player->input[a][b]);
-		   }
-		   printf("\n");
-		   }
-		   printf("---------------------------\n");
-		   for(int a=0;a<9;a++){
-		   for(int b=0;b<9;b++){
-		   printf("%d ", player->sol[a][b]);
-		   }
-		   printf("\n");
-		   }
-		 */
+		//스도쿠 검증 디버깅 코드
+		for(int a=0;a<9;a++){
+			for(int b=0;b<9;b++){
+				printf("%d ", player->input[a][b]);
+			}
+			printf("\n");
+		}
+		printf("---------------------------\n");
+		for(int a=0;a<9;a++){
+			for(int b=0;b<9;b++){
+				printf("%d ", player->sol[a][b]);
+			}
+			printf("\n");
+		}
 
 		input_num = correctSudoku(player); // 정답 검증
-	//	mvprintw(LINES-3,34,"input_num: %d",input_num);
-		input_num=1;
 
 		if(input_num == FALSE){	//답이 틀린 경우
 			mvprintw(LINES-2,34,"INCORRECT");
-			//printf("오답\n");
+			refresh();
+			sleep(1);
+
 			if(mode==MULTI)
 				game->plus_score[playerNum-1] -= 50;
+
 			wrong++;
 		}
-		else if(input_num == -1){	//기존의 주어진 문제를 잘못 입력한 경우
+		else if(input_num == -1) {	//기존의 주어진 문제를 잘못 입력한 경우
 			mvprintw(LINES-2,34,"INCORRECT");
-			//printf("오답\n");
 			game->plus_score[playerNum-1] -= 50;
 			wrong++;
 		}
-		//위 두 케이스를 구분할지 말지 정하지 않음
-		else{
-			cor=1;//debug##
+		else {
+			cor=1; 
+
 			if(cor) {
 				mvprintw(LINES-2,34,"CORRECT");
-				//printSudoku(player->sol);##
+				refresh();
+				sleep(1);
+
 				if(mode==MULTI)
 					game->score[playerNum-1] = game->plus_score[playerNum-1];//this point
 			}
 		}
 
-		if(mode == MULTI){	
+		if(mode == MULTI) {	
 			isGameover = 1;
-			//모든 플레이어가 점수를 잃었을 때 gameover
-			for(int k = 0; k<game->people; k++){
+
+			for(int k = 0; k < game->people; k++)
 				if(game -> plus_score[k] > 0) isGameover = 0;
-			}
+
 			if(isGameover) {
-				printf("무승부\n");
+				mvprintw(LINES-2, 34, "DRAW!!!!");
+				refresh();
+				sleep(1);
 				break;
 			}
 		}
