@@ -28,7 +28,6 @@ static FIELD *fields[11];
 static WINDOW *win_body, *win_form;
 static WINDOW *my_menu_win;
 
-//static int flag;
 static char* trim_whitespaces(char *str);
 static void set_field(FIELD *field[]);
 static void free_all(FORM *form,FIELD *fields[]);
@@ -166,7 +165,6 @@ void printSudoku(int sudo_p[][9]){
 				tmp[idx++]=sudo_p[i][j];//########
 			}
 		}
-		//	printf("\n");
 	}
 
 	int k=3;
@@ -339,9 +337,6 @@ void tradeNumber(){
 		}
 }
 
-//void removeNum(int level, int weight){
-
-
 //파일 입출력을 통해 좋은 예시의 스도쿠 원형을 받음
 void downloadSudoku(){
 	FILE *fp = fopen(".sudoku","rt");
@@ -463,22 +458,6 @@ int playSudoku(int mode,int level,Game* game){
 
 		sudoku_answer(); // 정답 입력 UI 출력
 		IN_sudoku(player); // 정답 검증 준비
-
-		//스도쿠 검증 디버깅 코드
-		for(int a=0;a<9;a++){
-			for(int b=0;b<9;b++){
-				printf("%d ", player->input[a][b]);
-			}
-			printf("\n");
-		}
-		printf("---------------------------\n");
-		for(int a=0;a<9;a++){
-			for(int b=0;b<9;b++){
-				printf("%d ", player->sol[a][b]);
-			}
-			printf("\n");
-		}
-
 		input_num = correctSudoku(player); // 정답 검증
 
 		if(input_num == FALSE){	//답이 틀린 경우
