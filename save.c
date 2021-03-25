@@ -13,6 +13,7 @@ void setOption(Setting *set){
 	mvprintw(12,34,"INPUT SUDOKU ROUND : ");
 	scanw(" %d",&set->sudoku_round);
 	mvprintw(12, 55, "%d", set->sudoku_round);
+	set->minus_score = -50;
 	return;
 }
 

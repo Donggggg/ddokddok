@@ -188,8 +188,8 @@ static void print_logo(WINDOW *my_menu_win)
 {
 	char line[255];
 	FILE *fp;
-	fp=fopen("test.txt","r");
-	if(fp==NULL)    err(EXIT_FAILURE,"NO test.txt file");
+	fp=fopen(".logo","r");
+	if(fp==NULL)    err(EXIT_FAILURE,"NO logo file");
 	int i=12;
 	while(fgets(line,sizeof(line),fp)!=NULL)
 	{
