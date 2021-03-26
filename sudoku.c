@@ -396,9 +396,9 @@ void makeSudokuOrigin(){
 }
 
 void makeSudokuProblem(int level){
-	//37 - 55까지
-	//레벨 당 구멍 개수: 35 + level*2
-	int count = (35 + level*2), hole; 
+	//10 - 40까지
+	//레벨 당 구멍 개수: 10 + level*3
+	int count = (10 + level*3), hole; 
 	blank = count;
 	srand(time(NULL));
 	while(count){
@@ -410,7 +410,6 @@ void makeSudokuProblem(int level){
 	}
 }
 
-//저장된 스도쿠 불러오기
 void IN_sudoku(_Player* pop){
 	int k=0;
 	for(int i = 0; i<9; i++)
