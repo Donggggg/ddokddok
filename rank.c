@@ -43,6 +43,28 @@ static char *ranking[] = {
 
 //print ddok ddok logo
 static void print_logo(WINDOW *my_menu_win);
+
+char* intToTime(int time)
+{
+	int sec, min;
+	char *format, buf[2];
+	format = malloc(sizeof(char) * 5);
+	memset(format, '\0', 5);
+
+	min = time / 60;
+	sec = time % 60;
+
+	buf[0] = (min / 10) + '0';
+	buf[1] = (min % 10) + '0';
+	strcat(format, buf);
+	format[2] = ':';
+	buf[0] = (sec / 10) + '0';
+	buf[1] = (sec % 10) + '0';
+	strcat(format, buf);
+
+	return format;
+}
+
 void select_game_show()
 {	
 	//menu seletions in MENU
@@ -207,8 +229,8 @@ void printScore(int ChooseLank){
 					strcpy(ranking[choice_go], miro_out[i].name);
 				}
 				else if(choice_go % 3 == 2){ //score
-					sprintf(strscore, "%d", miro_out[i].score);
-					ranking[choice_go] = malloc(sizeof(char)*10);
+					sprintf(strscore, "%s", intToTime(miro_out[i].score));
+					ranking[choice_go] = malloc(sizeof(char)*20);
 					strcpy(ranking[choice_go], strscore);
 				}
 				choice_go += 1;
@@ -232,8 +254,8 @@ void printScore(int ChooseLank){
 					strcpy(ranking[choice_go], sudo_out[i].name);
 				}
 				else if(choice_go % 3 == 2){ //score
-					sprintf(strscore, "%d", sudo_out[i].score);
-					ranking[choice_go] = malloc(sizeof(char)*10);
+					sprintf(strscore, "%s", intToTime(sudo_out[i].score));
+					ranking[choice_go] = malloc(sizeof(char)*20);
 					strcpy(ranking[choice_go], strscore);
 				}
 				choice_go += 1;

@@ -416,8 +416,8 @@ void IN_sudoku(_Player* pop){
 	{
 		for(int j = 0; j<9;j++)
 		{
-			pop->input[i][j]=sudoku_answer_int[k++];
-			//pop->input[i][j]=sudoku.origin[i][j];
+			//pop->input[i][j]=sudoku_answer_int[k++]; // 답변 입력
+			pop->input[i][j]=sudoku.origin[i][j]; // 정답 즉시입력
 			pop->sol[i][j] = sudoku.problem[i][j];
 		}
 	}
